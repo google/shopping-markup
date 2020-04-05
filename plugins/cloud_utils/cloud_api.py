@@ -19,7 +19,7 @@
 import json
 from typing import Any, List
 
-from absl import logging
+import logging
 from googleapiclient import errors
 import requests.exceptions
 

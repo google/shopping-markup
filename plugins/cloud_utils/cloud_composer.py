@@ -17,7 +17,7 @@
 """Manage operations on Cloud Composer."""
 
 from typing import Any, Dict
-from absl import logging
+import logging
 
 from googleapiclient import errors
 from plugins.cloud_utils import cloud_auth

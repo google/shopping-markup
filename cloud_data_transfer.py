@@ -17,7 +17,7 @@
 # TODO: Move the module to cloud_utils after third_party migration.
 """Module for managing BigQuery data transfers."""
 
-from absl import logging
+import logging
 
 from plugins.cloud_utils import cloud_auth
 from plugins.cloud_utils import utils

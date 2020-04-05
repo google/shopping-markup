@@ -23,7 +23,7 @@
 import time
 from typing import Any, Dict, Text
 
-from absl import logging
+import logging
 import apiclient
 from googleapiclient import errors
 from googleapiclient import http

@@ -20,7 +20,7 @@ import os
 from typing import Optional, Tuple
 from urllib import parse
 
-from absl import logging
+import logging
 
 from google.api_core import exceptions
 from google.api_core import retry

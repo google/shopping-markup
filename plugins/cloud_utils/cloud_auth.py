@@ -21,7 +21,7 @@ import json
 import os
 import textwrap
 from typing import Any, Dict
-from absl import logging
+import logging
 
 import apiclient
 from googleapiclient import discovery
