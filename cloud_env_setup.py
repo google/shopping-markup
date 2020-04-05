@@ -30,7 +30,7 @@ from typing import Dict, Union
 from google.cloud import bigquery
 from google.cloud.core_future import exceptions
 from plugins.cloud_utils import cloud_api
- import cloud_data_transfer
+import cloud_data_transfer
 
 _DEFAULT_DATASET_LOCATION = 'US'
 
