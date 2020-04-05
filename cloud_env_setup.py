@@ -77,7 +77,7 @@ def create_dataset_if_not_exists(project_id: str, dataset_id: str) -> None:
 
 def load_language_codes(project_id: str, dataset_id: str) -> None:
   """Loads language codes."""
-  client = bigquery.Client(project=project_id)
+  client = bigquery.Client()
   fully_qualified_table_id = f'{project_id}.{dataset_id}.language_codes'
   job_config = bigquery.LoadJobConfig(
       source_format=bigquery.SourceFormat.CSV,
@@ -94,7 +94,7 @@ def load_language_codes(project_id: str, dataset_id: str) -> None:
 
 def load_geo_targets(project_id: str, dataset_id: str) -> None:
   """Loads geo targets."""
-  client = bigquery.Client(project=project_id)
+  client = bigquery.Client()
   fully_qualified_table_id = f'{project_id}.{dataset_id}.geo_targets'
   job_config = bigquery.LoadJobConfig(
       source_format=bigquery.SourceFormat.CSV,
@@ -155,7 +155,8 @@ def configure_sql(sql_path: str, query_params: Dict[str, Union[str, int,
   return sql_script.format(**params)
 
 
-def execute_queries(project_id: str, dataset_id: str, customer_id: str) -> None:
+def execute_queries(project_id: str, dataset_id: str, merchant_id: str,
+                    customer_id: str) -> None:
   """Executes list of queries."""
   sql_files = [
       '1_product_view.sql', '2_product_metrics_view.sql', '3_customer_view.sql',
@@ -166,6 +167,7 @@ def execute_queries(project_id: str, dataset_id: str, customer_id: str) -> None:
   query_params = {
       'project_id': project_id,
       'dataset': dataset_id,
+      'merchant_id': merchant_id,
       'external_customer_id': customer_id
   }
   client = bigquery.Client()
@@ -216,7 +218,8 @@ def main():
   load_language_codes(args.project_id, args.dataset_id)
   load_geo_targets(args.project_id, args.dataset_id)
   logging.info('Creating MarkUp specific views.')
-  execute_queries(args.project_id, args.dataset_id, args.ads_customer_id)
+  execute_queries(args.project_id, args.dataset_id, args.merchant_id,
+                  args.ads_customer_id)
   logging.info('Created MarkUp specific views.')
 
 
