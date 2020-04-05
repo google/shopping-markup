@@ -170,7 +170,7 @@ def execute_queries(project_id: str, dataset_id: str, merchant_id: str,
       'merchant_id': merchant_id,
       'external_customer_id': customer_id
   }
-  client = bigquery.Client()
+  client = bigquery.Client(project=project_id)
   for sql_file in sql_files:
     query = configure_sql(os.path.join(prefix, sql_file), query_params)
     client.query(query)
