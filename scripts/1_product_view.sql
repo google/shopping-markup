@@ -52,13 +52,13 @@ AS (
     IFNULL(SPLIT(product_type, '>')[SAFE_OFFSET(4)], 'N/A') AS product_type_l5,
     IF(availability = 'in stock', 1, 0) AS in_stock
   FROM
-    `{project_id}.{dataset}.Products_<merchant_id>`
+    `{project_id}.{dataset}.Products_{merchant_id}`
   WHERE
     _PARTITIONDATE IN (
       (
         SELECT
           MAX(_PARTITIONDATE)
         FROM
-          `{project_id}.{dataset}.Products_<merchant_id>`
+          `{project_id}.{dataset}.Products_{merchant_id}`
       ))
 );
