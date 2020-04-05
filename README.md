@@ -38,11 +38,11 @@ data-driven decisions to improve their feed health and shopping ads performance.
         [GCP Project Id](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
     *   `merchant_id`:
         [Google Merchant Center Id](https://support.google.com/merchants/answer/188924?hl=en)
-    *   `customer_id`:
+    *   `ads_customer_id`:
         [Google Ads External Customer Id](https://support.google.com/google-ads/answer/1704344?hl=en)
 
     ```
-      sh setup.sh --project_id=<project_id> --merchant_id=<merchant_id> --customer_id=<customer_id>
+      sh setup.sh --project_id=<project_id> --merchant_id=<merchant_id> --ads_customer_id=<ads_customer_id>
     ```
 
 ## Step 3: Configure Data Sources

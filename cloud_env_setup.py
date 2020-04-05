@@ -50,8 +50,7 @@ def enable_apis(project_id) -> None:
   Args:
     project_id: A cloud project id.
   """
-  cloud_api_utils = cloud_api.CloudApiUtils(
-      project_id=project_id)
+  cloud_api_utils = cloud_api.CloudApiUtils(project_id=project_id)
   cloud_api_utils.enable_apis(_APIS_TO_BE_ENABLED)
 
 
@@ -200,14 +199,25 @@ def parse_arguments() -> argparse.Namespace:
 def main():
   args = parse_arguments()
   data_transfer = cloud_data_transfer.CloudDataTransferUtils(args.project_id)
+  logging.info('Enabling APIs.')
   enable_apis(args.project_id)
+  logging.info('Enabled APIs.')
+  logging.info('Creating %s dataset.', args.dataset_id)
   create_dataset_if_not_exists(args.project_id, args.dataset_id)
+  logging.info('Created %s dataset.', args.dataset_id)
+  logging.info('Creating Merchant Center Transfer.')
   data_transfer.create_merchant_center_transfer(args.merchant_id,
                                                 args.dataset_id)
-  data_transfer.create_google_ads_transfer(args.customer_id, args.dataset_id)
+  logging.info('Created Merchant Center Transfer.')
+  logging.info('Creating Google Ads Transfer.')
+  data_transfer.create_google_ads_transfer(args.ads_customer_id,
+                                           args.dataset_id)
+  logging.info('Created Google Ads Transfer.')
   load_language_codes(args.project_id, args.dataset_id)
   load_geo_targets(args.project_id, args.dataset_id)
-  execute_queries(args.project_id, args.dataset_id, args.customer_id)
+  logging.info('Creating MarkUp specific views.')
+  execute_queries(args.project_id, args.dataset_id, args.ads_customer_id)
+  logging.info('Created MarkUp specific views.')
 
 
 if __name__ == '__main__':

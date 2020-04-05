@@ -1,1 +1,2 @@
 google-cloud-bigquery==1.24
+google-api-python-client==1.8
