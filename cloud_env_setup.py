@@ -77,7 +77,7 @@ def create_dataset_if_not_exists(project_id: str, dataset_id: str) -> None:
 
 def load_language_codes(project_id: str, dataset_id: str) -> None:
   """Loads language codes."""
-  client = bigquery.Client()
+  client = bigquery.Client(project=project_id)
   fully_qualified_table_id = f'{project_id}.{dataset_id}.language_codes'
   job_config = bigquery.LoadJobConfig(
       source_format=bigquery.SourceFormat.CSV,
@@ -94,7 +94,7 @@ def load_language_codes(project_id: str, dataset_id: str) -> None:
 
 def load_geo_targets(project_id: str, dataset_id: str) -> None:
   """Loads geo targets."""
-  client = bigquery.Client()
+  client = bigquery.Client(project=project_id)
   fully_qualified_table_id = f'{project_id}.{dataset_id}.geo_targets'
   job_config = bigquery.LoadJobConfig(
       source_format=bigquery.SourceFormat.CSV,
