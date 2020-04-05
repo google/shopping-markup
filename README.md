@@ -47,33 +47,39 @@ data-driven decisions to improve their feed health and shopping ads performance.
 
 ## Step 3: Configure Data Sources
 
-1.  [Create Product Detailed Data Source](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
+1.  Create Product Detailed Data Source
 
+    *   Click on the
+        [link](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
     *   Search "`project_id`" under My Projects
-    *   Under Dataset, click on the "`markup`"
+    *   Under Dataset, click on "`markup`"
     *   Under Table, choose "`product_aggregated_category`"
     *   Click Connect on the top right corner and wait for the data-source to be
         created
 
-2.  [Create Product Aggregated Category Data Source](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
+2.  Create Product Aggregated Category Data Source
 
+    *   Click on the
+        [link](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
     *   Search "`project_id`" under My Projects
-    *   Under Dataset, click on the "`markup`"
-    *   Under Table, choose "`product_aggregated_category`"
+    *   Under Dataset, click on "`markup`"
+    *   Under Table, choose "`product_detailed`"
     *   Click Connect on the top right corner and wait for the data-source to be
         created
 
-3.  [Create Product Aggregated Label Data Source](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
+3.  Create Product Aggregated Label Data Source
 
+    *   Click on the
+        [link](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
     *   Search "`project_id`" under My Projects
-    *   Under Dataset, click on the "`markup`"
+    *   Under Dataset, click on "`markup`"
     *   Under Table, choose "`product_aggregated_label`"
-    *   Click Connect on the top right corner and wait for the data-source to be
-        created
+    *   Click `Connect` on the top right corner and wait for the data-source to
+        be created
 
 ## Step 4: Create Data-Studio Dashboard
 
-1.  Open
+1.  Click on the
     [link](https://datastudio.google.com/c/u/0/reporting/1IsvsvrfAvyhefHK33zxfj72neYfn9YnO/page/e377/preview)
 2.  Click "`Use Template`"
 3.  Choose the new data-sources created in the previous step in the following
