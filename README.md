@@ -49,7 +49,7 @@ data-driven decisions to improve their feed health and shopping ads performance.
 
 1.  [Create Product Detailed Data Source](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
 
-    *   Search `<project_id>` under My Projects
+    *   Search "`project_id`" under My Projects
     *   Under Dataset, click on the "`markup`"
     *   Under Table, choose "`product_aggregated_category`"
     *   Click Connect on the top right corner and wait for the data-source to be
@@ -57,7 +57,7 @@ data-driven decisions to improve their feed health and shopping ads performance.
 
 2.  [Create Product Aggregated Category Data Source](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
 
-    *   Search `<project_id>` under My Projects
+    *   Search "`project_id`" under My Projects
     *   Under Dataset, click on the "`markup`"
     *   Under Table, choose "`product_aggregated_category`"
     *   Click Connect on the top right corner and wait for the data-source to be
@@ -65,7 +65,7 @@ data-driven decisions to improve their feed health and shopping ads performance.
 
 3.  [Create Product Aggregated Label Data Source](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
 
-    *   Search `<project_id>` under My Projects
+    *   Search "`project_id`" under My Projects
     *   Under Dataset, click on the "`markup`"
     *   Under Table, choose "`product_aggregated_label`"
     *   Click Connect on the top right corner and wait for the data-source to be
