@@ -42,7 +42,7 @@ data-driven decisions to improve their feed health and shopping ads performance.
         [Google Ads External Customer Id](https://support.google.com/google-ads/answer/1704344?hl=en)
 
     ```
-      python3 cloud_env_setup.py --project_id=<project_id> --merchant_id=<merchant_id> --customer_id=<customer_id>
+      sh setup.sh --project_id=<project_id> --merchant_id=<merchant_id> --customer_id=<customer_id>
     ```
 
 ## Step 3: Configure Data Sources
