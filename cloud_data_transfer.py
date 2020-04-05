@@ -17,24 +17,13 @@
 # TODO: Move the module to cloud_utils after third_party migration.
 """Module for managing BigQuery data transfers."""
 
-import logging
-import time
-from typing import Any, Dict
+from absl import logging
 
 from plugins.cloud_utils import cloud_auth
 from plugins.cloud_utils import utils
 
 _MERCHANT_CENTER_ID = 'merchant_center'  # Data source id for Merchant Center.
 _GOOGLE_ADS_ID = 'adwords'  # Data source id for Google Ads.
-_SLEEP_SECONDS = 10  # Seconds to sleep before checking resource status.
-
-
-class Error(Exception):
-  """Base error for this module."""
-
-
-class DataTransferError(Error):
-  """An exception to be raised when data transfer was not successful."""
 
 
 class CloudDataTransferUtils(object):
@@ -53,43 +42,6 @@ class CloudDataTransferUtils(object):
     """
     self.project_id = project_id
     self.client = cloud_auth.build_service_client('bigquerydatatransfer')
-
-  def _wait_for_transfer_completion(self, transfer_config: Dict[str,
-                                                                Any]) -> None:
-    """Waits for the completion of data transfer operation.
-
-    This method retrieves data transfer operation and checks for its status. If
-    the operation is not completed, then the operation is re-checked after
-    `_SLEEP_SECONDS` seconds.
-
-    Args:
-      transfer_config: Resource representing data transfer.
-
-    Raises:
-      DataTransferError: If the data transfer is not successfully completed.
-    """
-    transfer_config_name = transfer_config['name']
-    transfer_config_id = transfer_config_name.split('/')[-1]
-    parent = f'projects/{self.project_id}/transferConfigs/{transfer_config_id}'
-    while True:
-      request = self.client.projects().transferConfigs().runs().list(
-          parent=parent)
-      response = utils.execute_request(request)
-      latest_transfer = response['transferRuns'][0]
-      if latest_transfer['state'] == 'SUCCEEDED':
-        logging.info('Transfer %s was successful.', transfer_config_name)
-        return
-      if (latest_transfer['state'] == 'FAILED' or
-          latest_transfer['state'] == 'CANCELLED'):
-        error_message = ('Transfer %s was not successful. Error - %s.',
-                         transfer_config_name,
-                         latest_transfer['errorStatus']['message'])
-        logging.error(error_message)
-        raise DataTransferError(error_message)
-      logging.info(
-          'Transfer %s still in progress. Sleeping for %s seconds before '
-          'checking again.', transfer_config_name, _SLEEP_SECONDS)
-      time.sleep(_SLEEP_SECONDS)
 
   def create_merchant_center_transfer(self, merchant_id: str,
                                       destination_dataset: str) -> None:
@@ -117,8 +69,7 @@ class CloudDataTransferUtils(object):
     }
     request = self.client.projects().transferConfigs().create(
         parent=parent, body=body)
-    transfer_config = utils.execute_request(request)
-    self._wait_for_transfer_completion(transfer_config)
+    utils.execute_request(request)
     logging.info(
         'Data transfer created for merchant id %s to destination dataset %s',
         merchant_id, destination_dataset)
@@ -148,8 +99,7 @@ class CloudDataTransferUtils(object):
     }
     request = self.client.projects().transferConfigs().create(
         parent=parent, body=body)
-    transfer_config = utils.execute_request(request)
-    self._wait_for_transfer_completion(transfer_config)
+    utils.execute_request(request)
     logging.info(
         'Data transfer created for Google Ads customer id %s to destination '
         'dataset %s', customer_id, destination_dataset)

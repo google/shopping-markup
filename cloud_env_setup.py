@@ -31,7 +31,8 @@ from google.cloud import bigquery
 from google.cloud.core_future import exceptions
 from plugins.cloud_utils import cloud_api
  import cloud_data_transfer
-from pyglib import resources
+
+_DEFAULT_DATASET_LOCATION = 'US'
 
 # Set logging level.
 logging.getLogger().setLevel(logging.INFO)
@@ -40,17 +41,17 @@ logging.getLogger().setLevel(logging.INFO)
 _APIS_TO_BE_ENABLED = [
     'bigquery.googleapis.com', 'bigquerydatatransfer.googleapis.com'
 ]
-_DEFAULT_DATASET_LOCATION = 'US'
 _DATASET_ID = 'markup'
 
 
-def enable_apis(project_id: str) -> None:
+def enable_apis(project_id) -> None:
   """Enables list of cloud APIs for given cloud project.
 
   Args:
     project_id: A cloud project id.
   """
-  cloud_api_utils = cloud_api.CloudApiUtils(project_id=project_id)
+  cloud_api_utils = cloud_api.CloudApiUtils(
+      project_id=project_id)
   cloud_api_utils.enable_apis(_APIS_TO_BE_ENABLED)
 
 
@@ -84,8 +85,7 @@ def load_language_codes(project_id: str, dataset_id: str) -> None:
       skip_leading_rows=1,
       autodetect=True,
   )
-  input_file = 'data/language_codes.csv'
-  file_name = resources.GetResourceFilename(input_file)
+  file_name = 'data/language_codes.csv'
   with open(file_name, 'rb') as source_file:
     job = client.load_table_from_file(
         source_file, fully_qualified_table_id, job_config=job_config)
@@ -102,8 +102,7 @@ def load_geo_targets(project_id: str, dataset_id: str) -> None:
       skip_leading_rows=1,
       autodetect=True,
   )
-  input_file = 'data/geo_targets.csv'
-  file_name = resources.GetResourceFilename(input_file)
+  file_name = 'data/geo_targets.csv'
   with open(file_name, 'rb') as source_file:
     job = client.load_table_from_file(
         source_file, fully_qualified_table_id, job_config=job_config)
