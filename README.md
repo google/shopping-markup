@@ -42,32 +42,33 @@ data-driven decisions to improve their feed health and shopping ads performance.
         [Google Ads External Customer Id](https://support.google.com/google-ads/answer/1704344?hl=en)
 
     ```
+      cd markup
       sh setup.sh --project_id=<project_id> --merchant_id=<merchant_id> --ads_customer_id=<ads_customer_id>
     ```
 
 ## Step 3: Configure Data Sources
 
-1.  Create Product Detailed Data Source
+1.  Create `Product Aggregated Category` Data Source
 
     *   Click on the
         [link](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
     *   Search "`project_id`" under My Projects
     *   Under Dataset, click on "`markup`"
     *   Under Table, choose "`product_aggregated_category`"
-    *   Click Connect on the top right corner and wait for the data-source to be
-        created
+    *   Click `Connect` on the top right corner and wait for the data-source to
+        be created
 
-2.  Create Product Aggregated Category Data Source
+2.  Create `Product Detailed` Data Source
 
     *   Click on the
         [link](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
     *   Search "`project_id`" under My Projects
     *   Under Dataset, click on "`markup`"
     *   Under Table, choose "`product_detailed`"
-    *   Click Connect on the top right corner and wait for the data-source to be
-        created
+    *   Click `Connect` on the top right corner and wait for the data-source to
+        be created
 
-3.  Create Product Aggregated Label Data Source
+3.  Create `Product Aggregated Label` Data Source
 
     *   Click on the
         [link](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
