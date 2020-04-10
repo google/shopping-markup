@@ -27,7 +27,7 @@ SELECT
     ELSE
     1
   END
-    ) AS is_targetted,
+    ) AS is_targeted,
   MAX(title) AS title,
   MAX(link) AS item_url,
   MAX(product_type_l1) AS product_type_l1,
@@ -43,7 +43,8 @@ SELECT
   MAX(product_view.brand) AS brand,
   SUM(product_metrics_view.impressions_30_days) AS impressions_30_days,
   SUM(product_metrics_view.clicks_30_days) AS clicks_30_days,
-  SUM(product_metrics_view.cost_30_days) AS cost_30_days
+  SUM(product_metrics_view.cost_30_days) AS cost_30_days,
+  MAX(issues) AS issues
 FROM
   `{project_id}.{dataset}.product_view` product_view,
   UNNEST(destinations) AS destinations

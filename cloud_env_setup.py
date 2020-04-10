@@ -32,6 +32,7 @@ from google.cloud import exceptions
 from plugins.cloud_utils import cloud_api
 import cloud_data_transfer
 
+
 _DEFAULT_DATASET_LOCATION = 'US'
 
 # Set logging level.
@@ -44,7 +45,7 @@ _APIS_TO_BE_ENABLED = [
 _DATASET_ID = 'markup'
 
 
-def enable_apis(project_id) -> None:
+def enable_apis(project_id: str) -> None:
   """Enables list of cloud APIs for given cloud project.
 
   Args:
@@ -52,7 +53,6 @@ def enable_apis(project_id) -> None:
   """
   cloud_api_utils = cloud_api.CloudApiUtils(project_id=project_id)
   cloud_api_utils.enable_apis(_APIS_TO_BE_ENABLED)
-
 
 def create_dataset_if_not_exists(project_id: str, dataset_id: str) -> None:
   """Creates BigQuery dataset if it doesn't exists.
@@ -73,6 +73,7 @@ def create_dataset_if_not_exists(project_id: str, dataset_id: str) -> None:
     dataset.location = _DEFAULT_DATASET_LOCATION
     client.create_dataset(dataset)
     logging.info('Dataset %s created.', fully_qualified_dataset_id)
+
 
 
 def load_language_codes(project_id: str, dataset_id: str) -> None:
