@@ -10,7 +10,7 @@ WITH
     `{project_id}.{dataset}.product_view`,
     UNNEST(issues) issues )
 SELECT
-  product_view.aggregator_id AS account_id,
+  COALESCE(product_view.aggregator_id, product_view.merchant_id) AS account_id,
   MAX(customer_view.accountdescriptivename) AS account_display_name,
   product_view.merchant_id AS sub_account_id,
   product_view.unique_product_id,

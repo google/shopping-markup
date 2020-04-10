@@ -172,11 +172,12 @@ class CloudDataTransferUtils(object):
         'dataset %s', customer_id, destination_dataset)
     if backfill_days:
       transfer_config_name = transfer_config['name']
+      transfer_config_id = transfer_config_name.split('/')[-1]
       start_time = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(
           days=backfill_days)
       end_time = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(days=1)
       self.client.projects().transferConfigs().startManualRuns(
-          parent=f'{parent}/transferConfigs/{transfer_config_name}',
+          parent=f'{parent}/transferConfigs/{transfer_config_id}',
           body={
               'requestedTimeRange': {
                   'startTime': start_time.isoformat(),
