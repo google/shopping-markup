@@ -174,7 +174,8 @@ def execute_queries(project_id: str, dataset_id: str, merchant_id: str,
   client = bigquery.Client(project=project_id)
   for sql_file in sql_files:
     query = configure_sql(os.path.join(prefix, sql_file), query_params)
-    client.query(query)
+    query_job = client.query(query)
+    query_job.result()
 
 
 def parse_arguments() -> argparse.Namespace:

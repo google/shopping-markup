@@ -44,7 +44,7 @@ SELECT
   SUM(product_metrics_view.impressions_30_days) AS impressions_30_days,
   SUM(product_metrics_view.clicks_30_days) AS clicks_30_days,
   SUM(product_metrics_view.cost_30_days) AS cost_30_days,
-  MAX(issues) AS issues
+  ANY_VALUE(issues) AS issues
 FROM
   `{project_id}.{dataset}.product_view` product_view,
   UNNEST(destinations) AS destinations

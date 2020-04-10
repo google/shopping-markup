@@ -17,9 +17,12 @@
 # TODO: Move the module to cloud_utils after third_party migration.
 """Module for managing BigQuery data transfers."""
 
+import datetime
 import logging
 import time
 from typing import Any, Dict
+
+import pytz
 
 from plugins.cloud_utils import cloud_auth
 from plugins.cloud_utils import utils
@@ -122,7 +125,7 @@ class CloudDataTransferUtils(object):
         'params': {
             'merchant_id': merchant_id,
             'export_products': True,
-            'export_price_benchmarks': True
+            # 'export_price_benchmarks': True
         }
     }
     request = self.client.projects().transferConfigs().create(
@@ -133,8 +136,10 @@ class CloudDataTransferUtils(object):
         'Data transfer created for merchant id %s to destination dataset %s',
         merchant_id, destination_dataset)
 
-  def create_google_ads_transfer(self, customer_id: str,
-                                 destination_dataset: str) -> None:
+  def create_google_ads_transfer(self,
+                                 customer_id: str,
+                                 destination_dataset: str,
+                                 backfill_days: int = 30) -> None:
     """Creates a new Google Ads transfer.
 
     This method creates a data transfer config to copy Google Ads data to
@@ -143,6 +148,7 @@ class CloudDataTransferUtils(object):
     Args:
       customer_id: Google Ads customer id.
       destination_dataset: BigQuery dataset id.
+      backfill_days: Number of days to backfill.
     """
     logging.info(
         'Creating data transfer for Google Ads customer id %s to destination '
@@ -154,7 +160,8 @@ class CloudDataTransferUtils(object):
         'destination_dataset_id': destination_dataset,
         'params': {
             'customer_id': customer_id
-        }
+        },
+        'dataRefreshWindowDays': 1,
     }
     request = self.client.projects().transferConfigs().create(
         parent=parent, body=body)
@@ -163,3 +170,16 @@ class CloudDataTransferUtils(object):
     logging.info(
         'Data transfer created for Google Ads customer id %s to destination '
         'dataset %s', customer_id, destination_dataset)
+    if backfill_days:
+      transfer_config_name = transfer_config['name']
+      start_time = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(
+          days=backfill_days)
+      end_time = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(days=1)
+      self.client.projects().transferConfigs().startManualRuns(
+          parent=f'{parent}/transferConfigs/{transfer_config_name}',
+          body={
+              'requestedTimeRange': {
+                  'startTime': start_time.isoformat(),
+                  'endTime': end_time.isoformat()
+              }
+          }).execute()
