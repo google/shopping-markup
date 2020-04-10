@@ -54,6 +54,7 @@ def enable_apis(project_id: str) -> None:
   cloud_api_utils = cloud_api.CloudApiUtils(project_id=project_id)
   cloud_api_utils.enable_apis(_APIS_TO_BE_ENABLED)
 
+
 def create_dataset_if_not_exists(project_id: str, dataset_id: str) -> None:
   """Creates BigQuery dataset if it doesn't exists.
 
@@ -73,7 +74,6 @@ def create_dataset_if_not_exists(project_id: str, dataset_id: str) -> None:
     dataset.location = _DEFAULT_DATASET_LOCATION
     client.create_dataset(dataset)
     logging.info('Dataset %s created.', fully_qualified_dataset_id)
-
 
 
 def load_language_codes(project_id: str, dataset_id: str) -> None:

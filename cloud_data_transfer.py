@@ -122,8 +122,7 @@ class CloudDataTransferUtils(object):
         'params': {
             'merchant_id': merchant_id,
             'export_products': True,
-            'export_price_benchmarks': True,
-            'export_best_sellers': True
+            'export_price_benchmarks': True
         }
     }
     request = self.client.projects().transferConfigs().create(
