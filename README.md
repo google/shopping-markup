@@ -46,19 +46,9 @@ data-driven decisions to improve their feed health and shopping ads performance.
       sh setup.sh --project_id=<project_id> --merchant_id=<merchant_id> --ads_customer_id=<ads_customer_id>
     ```
 
-## Step 3: Configure Data Sources
+## Step 3: Configure Data Source
 
-1.  Create `Product Aggregated Category` Data Source
-
-    *   Click on the
-        [link](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
-    *   Search "`project_id`" under My Projects
-    *   Under Dataset, click on "`markup`"
-    *   Under Table, choose "`product_aggregated_category`"
-    *   Click `Connect` on the top right corner and wait for the data-source to
-        be created
-
-2.  Create `Product Detailed` Data Source
+1.  Create `Product Detailed` Data Source
 
     *   Click on the
         [link](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
@@ -68,24 +58,10 @@ data-driven decisions to improve their feed health and shopping ads performance.
     *   Click `Connect` on the top right corner and wait for the data-source to
         be created
 
-3.  Create `Product Aggregated Label` Data Source
-
-    *   Click on the
-        [link](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
-    *   Search "`project_id`" under My Projects
-    *   Under Dataset, click on "`markup`"
-    *   Under Table, choose "`product_aggregated_label`"
-    *   Click `Connect` on the top right corner and wait for the data-source to
-        be created
-
 ## Step 4: Create Data-Studio Dashboard
 
 1.  Click on the
     [link](https://datastudio.google.com/c/u/0/reporting/1IsvsvrfAvyhefHK33zxfj72neYfn9YnO/page/e377/preview)
 2.  Click "`Use Template`"
-3.  Choose the new data-sources created in the previous step in the following
-    order.
-    *   Product Aggregated Category
-    *   Product Detailed
-    *   Product Aggregated Label
+3.  Choose the new "`Product Detailed`" data-source created in the previous step
 4.  Click "`Copy Report`"

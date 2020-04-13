@@ -161,8 +161,7 @@ def execute_queries(project_id: str, dataset_id: str, merchant_id: str,
   """Executes list of queries."""
   sql_files = [
       '1_product_view.sql', '2_product_metrics_view.sql', '3_customer_view.sql',
-      '4_product_detailed_view.sql', '5_product_aggregated_category_view.sql',
-      '6_product_aggregated_label_view.sql'
+      '4_product_detailed_view.sql'
   ]
   prefix = 'scripts'
   query_params = {
