@@ -16,18 +16,41 @@ SELECT
   product_view.unique_product_id,
   MAX(product_view.offer_id) AS offer_id,
   MAX(product_view.in_stock) AS in_stock,
-  MIN(CASE
-      WHEN LOWER(destinations.status) <> 'approved' THEN 0
-    ELSE
-    1
-  END
-    ) AS is_approved,
-  MIN(CASE
-      WHEN servability IS NOT NULL AND LOWER(servability) <> 'unaffected' THEN 0
-    ELSE
-    1
-  END
-    ) AS is_targeted,
+  MAX(product_view.is_approved) AS is_approved,
+  MAX(product_view.is_targeted) AS is_targeted,
+  MAX(
+    CASE
+      WHEN is_approved = 1 AND in_stock = 1
+        THEN 1
+      ELSE 0
+    END) AS funnel_in_stock,
+  MAX(
+    CASE
+      WHEN is_approved = 1 AND in_stock = 1  AND is_targeted = 1
+        THEN 1
+      ELSE 0
+    END) AS funnel_targeted,
+  MAX(
+    CASE
+      WHEN
+        is_approved = 1
+        AND in_stock = 1
+        AND is_targeted = 1
+        AND impressions_30_days > 0
+        THEN 1
+      ELSE 0
+    END) AS funnel_has_impression,
+  MAX(
+    CASE
+      WHEN
+        is_approved = 1
+        AND in_stock = 1
+        AND is_targeted = 1
+        AND impressions_30_days > 0
+        AND clicks_30_days > 0
+        THEN 1
+      ELSE 0
+    END) AS funnel_has_clicks,
   MAX(title) AS title,
   MAX(link) AS item_url,
   MAX(product_type_l1) AS product_type_l1,
@@ -44,7 +67,8 @@ SELECT
   SUM(product_metrics_view.impressions_30_days) AS impressions_30_days,
   SUM(product_metrics_view.clicks_30_days) AS clicks_30_days,
   SUM(product_metrics_view.cost_30_days) AS cost_30_days,
-  ANY_VALUE(issues) AS issues
+  ANY_VALUE(issues) AS issues,
+
 FROM
   `{project_id}.{dataset}.product_view` product_view,
   UNNEST(destinations) AS destinations

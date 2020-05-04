@@ -32,7 +32,13 @@ data-driven decisions to improve their feed health and shopping ads performance.
 
 ## Step 2: Cloud environment setup
 
-1.  Perform environment setup after providing inputs.
+1.  Make sure the user executing next step has following permissions.
+
+    *   [Standard Access For GMC](https://support.google.com/merchants/answer/1637190?hl=en)
+    *   [Standard Access For Google Ads](https://support.google.com/google-ads/answer/7476552?hl=en)
+    *   [Editor(or Owner) Role in Google Cloud Project](https://cloud.google.com/iam/docs/understanding-roles)
+
+2.  Perform environment setup after providing inputs.
 
     *   `project_id`:
         [GCP Project Id](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
