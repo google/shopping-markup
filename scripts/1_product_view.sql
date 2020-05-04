@@ -50,15 +50,7 @@ AS (
     IFNULL(SPLIT(product_type, '>')[SAFE_OFFSET(2)], 'N/A') AS product_type_l3,
     IFNULL(SPLIT(product_type, '>')[SAFE_OFFSET(3)], 'N/A') AS product_type_l4,
     IFNULL(SPLIT(product_type, '>')[SAFE_OFFSET(4)], 'N/A') AS product_type_l5,
-    IF(availability = 'in stock', 1, 0) AS in_stock,
-    CASE
-      WHEN LOWER(destinations.status) <> 'approved' THEN 0
-      ELSE 1
-    END AS is_approved,
-    CASE
-      WHEN servability IS NOT NULL AND LOWER(servability) <> 'unaffected' THEN 0
-      ELSE 1
-    END AS is_targeted
+    IF(availability = 'in stock', 1, 0) AS in_stock
   FROM
     `{project_id}.{dataset}.Products_{merchant_id}`
   WHERE
