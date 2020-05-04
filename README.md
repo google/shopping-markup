@@ -26,6 +26,11 @@ data-driven decisions to improve their feed health and shopping ads performance.
 3.  [Open cloud shell](https://console.cloud.google.com/cloudshell) and clone
     the repository.
 
+    *   Create a cookie for the Git client to use by visiting
+        [https://cse.googlesource.com/new-password](https://cse.googlesource.com/new-password)
+        and following the instructions.
+    *   Execute following command.
+
     ```
       git clone https://cse.googlesource.com/solutions/markup
     ```
@@ -71,3 +76,4 @@ data-driven decisions to improve their feed health and shopping ads performance.
 2.  Click "`Use Template`"
 3.  Choose the new "`Product Detailed`" data-source created in the previous step
 4.  Click "`Copy Report`"
+
