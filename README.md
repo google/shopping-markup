@@ -52,6 +52,11 @@ data-driven decisions to improve their feed health and shopping ads performance.
     *   `ads_customer_id`:
         [Google Ads External Customer Id](https://support.google.com/google-ads/answer/1704344?hl=en)
 
+    During the installation, the script will check whether does current user
+    have enough permissions to continue. It may ask you to open cloud
+    authorization URL in the browser. Please follow the instructions as
+    mentioned in the command line.
+
     ```
       cd markup
       sh setup.sh --project_id=<project_id> --merchant_id=<merchant_id> --ads_customer_id=<ads_customer_id>
@@ -63,6 +68,8 @@ data-driven decisions to improve their feed health and shopping ads performance.
 
     *   Click on the
         [link](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
+    *   Make sure you are using BigQuery connector. If not choose "`BigQuery`"
+        from the list of available connectors.
     *   Search "`project_id`" under My Projects
     *   Under Dataset, click on "`markup`"
     *   Under Table, choose "`product_detailed`"
@@ -76,4 +83,3 @@ data-driven decisions to improve their feed health and shopping ads performance.
 2.  Click "`Use Template`"
 3.  Choose the new "`Product Detailed`" data-source created in the previous step
 4.  Click "`Copy Report`"
-

@@ -37,6 +37,7 @@ _DEFAULT_DATASET_LOCATION = 'US'
 
 # Set logging level.
 logging.getLogger().setLevel(logging.INFO)
+logging.getLogger("googleapiclient.discovery").setLevel(logging.WARNING)
 
 # Required Cloud APIs to be enabled.
 _APIS_TO_BE_ENABLED = [

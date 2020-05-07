@@ -178,7 +178,7 @@ class CloudDataTransferUtils(object):
         'params': {
             'customer_id': customer_id
         },
-        'dataRefreshWindowDays': backfill_days,
+        'dataRefreshWindowDays': 1,
     }
     request = self.client.projects().transferConfigs().create(
         parent=parent, authorizationCode=authorization_code, body=body)
@@ -187,20 +187,20 @@ class CloudDataTransferUtils(object):
     logging.info(
         'Data transfer created for Google Ads customer id %s to destination '
         'dataset %s', customer_id, destination_dataset)
-    # if backfill_days:
-    #   transfer_config_name = transfer_config['name']
-    #   transfer_config_id = transfer_config_name.split('/')[-1]
-    #   start_time = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(
-    #       days=backfill_days)
-    #   end_time = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(days=1)
-    #   self.client.projects().transferConfigs().startManualRuns(
-    #       parent=f'{parent}/transferConfigs/{transfer_config_id}',
-    #       body={
-    #           'requestedTimeRange': {
-    #               'startTime': start_time.isoformat(),
-    #               'endTime': end_time.isoformat()
-    #           }
-    #       }).execute()
+    if backfill_days:
+      transfer_config_name = transfer_config['name']
+      transfer_config_id = transfer_config_name.split('/')[-1]
+      start_time = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(
+          days=backfill_days)
+      end_time = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(days=1)
+      self.client.projects().transferConfigs().startManualRuns(
+          parent=f'{parent}/transferConfigs/{transfer_config_id}',
+          body={
+              'requestedTimeRange': {
+                  'startTime': start_time.isoformat(),
+                  'endTime': end_time.isoformat()
+              }
+          }).execute()
     return transfer_config
 
   def _get_data_source(self, data_source_id: str) -> Dict[str, Any]:
