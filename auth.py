@@ -33,9 +33,10 @@ def retrieve_authorization_code(client_id: str, scopes: List[str],
     scopes: The list of scopes.
     app_name: Name of the app.
   """
+  scopes_str = ' '.join(scopes)
   authorization_code_request = {
       'client_id': client_id,
-      'scope': scopes,
+      'scope': scopes_str,
       'redirect_uri': REDIRECT_URI
   }
 
@@ -43,7 +44,7 @@ def retrieve_authorization_code(client_id: str, scopes: List[str],
       authorization_code_request, quote_via=parse.quote)
   url = f'{BASE_URL}?{encoded_request}'
   logging.info(
-      'Please click on the URL below to authorize %s and paste the'
+      'Please click on the URL below to authorize %s and paste the '
       'authorization code.', app_name)
   logging.info('URL - %s', url)
 
