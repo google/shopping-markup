@@ -55,10 +55,9 @@ data-driven decisions to improve their feed health and shopping ads performance.
     During the installation, the script will check whether does current user
     have enough permissions to continue. It may ask you to open cloud
     authorization URL in the browser. Please follow the instructions as
-    mentioned in the command line.\
+    mentioned in the command line.
 
-    <b>If the script fails when you run it for the first time, it might be due to delay in preparing Merchant
-    account data. Please wait up to 90 minutes before re-running the script.</b>
+    ####If the script fails when you run it for the first time, it might be due to delay in preparing Merchant account data. Please wait up to 90 minutes before re-running the script.####
 
     ```
       cd markup
