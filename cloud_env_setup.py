@@ -37,7 +37,7 @@ _DEFAULT_DATASET_LOCATION = 'US'
 
 # Set logging level.
 logging.getLogger().setLevel(logging.INFO)
-logging.getLogger("googleapiclient.discovery").setLevel(logging.WARNING)
+logging.getLogger('googleapiclient.discovery').setLevel(logging.WARNING)
 
 # Required Cloud APIs to be enabled.
 _APIS_TO_BE_ENABLED = [
@@ -212,12 +212,12 @@ def main():
   logging.info('Creating Merchant Center Transfer.')
   merchant_center_config = data_transfer.create_merchant_center_transfer(
       args.merchant_id, args.dataset_id)
+  data_transfer.wait_for_transfer_completion(merchant_center_config)
   logging.info('Created Merchant Center Transfer.')
   logging.info('Creating Google Ads Transfer.')
   ads_config = data_transfer.create_google_ads_transfer(args.ads_customer_id,
                                                         args.dataset_id)
   logging.info('Created Google Ads Transfer.')
-  data_transfer.wait_for_transfer_completion(merchant_center_config)
   data_transfer.wait_for_transfer_completion(ads_config)
   load_language_codes(args.project_id, args.dataset_id)
   load_geo_targets(args.project_id, args.dataset_id)
