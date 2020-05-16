@@ -1,4 +1,5 @@
 # MarkUp
+Disclaimer: This is not an official Google product.
 
 *   [Overview](#overview)
 *   [Step 1: Environment setup](#step-1-environment-setup)
