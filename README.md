@@ -83,7 +83,7 @@ data-driven decisions to improve their feed health and shopping ads performance.
 ## Step 4: Create Data-Studio Dashboard
 
 1.  Click on the
-    [link](https://datastudio.google.com/c/u/0/reporting/1IsvsvrfAvyhefHK33zxfj72neYfn9YnO/page/e377/preview)
+    [link](https://datastudio.google.com/c/u/0/reporting/717c29df-0d54-421a-881a-2c629abe3e97/page/l11LB/preview)
 2.  Click "`Use Template`"
 3.  Choose the new "`Product Detailed`" data-source created in the previous step
 4.  Click "`Copy Report`"
