@@ -1,5 +1,6 @@
 # MarkUp
-Disclaimer: This is not an official Google product.
+
+Disclaimer: This is not an officially supported Google product.
 
 *   [Overview](#overview)
 *   [Step 1: Environment setup](#step-1-environment-setup)
