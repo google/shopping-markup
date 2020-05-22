@@ -25,14 +25,14 @@ data-driven decisions to improve their feed health and shopping ads performance.
 
 ### 1.1. Value Proposition
 
-1.  Users can find opportunities and issues at each stage of the Shopping Funnel
+*   Users can find opportunities and issues at each stage of the Shopping Funnel
     both overall and detailed data cuts.
 
-2.  Richer insights with data joins to provide overall and product level
+*   Richer insights with data joins to provide overall and product level
     performance information pivoted towards custom attributes (product type,
     brand, etc) for deeper insights.
 
-3.  Near real-time dashboard to share data and insights across different teams
+*   Near real-time dashboard to share data and insights across different teams
     and areas of the business seamlessly to address issues & optimize
     performance.
 
@@ -51,13 +51,13 @@ Project on a daily basis and provide insights via Data Studio dashboard.
 
 You may skip this step if you already have a GCP account with billing enaled.
 
-1.  How to [Create a GCP account](https://cloud.google.com/?authuser=1) (if you
+*   How to [Create a GCP account](https://cloud.google.com/?authuser=1) (if you
     don't have one already!)
 
-2.  How to
+*   How to
     [Create and Manage Projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
 
-3.  How to
+*   How to
     [Create, Modify, or Close Your Billing Account](https://cloud.google.com/billing/docs/how-to/manage-billing-account)
 
 #### 2.1.2 Check the permissions
@@ -104,18 +104,18 @@ browser. Please follow the instructions as mentioned in the command line.
 
 During the installation process, the script will do following:
 
-1.  Enable Google Cloud Components and Google APIs
+*   Enable Google Cloud Components and Google APIs
 
     *   [BigQuery](https://console.cloud.google.com/bigquery)
 
     *   [BigQuery Data Transfer](https://console.cloud.google.com/bigquery/transfers)
 
-2.  Create Google Merchant Center and Google Ads data transfers.
+*   Create Google Merchant Center and Google Ads data transfers.
 
-3.  Create recurring data transfer jobs so that the latest data is imported in
+*   Create recurring data transfer jobs so that the latest data is imported in
     near real time.
 
-4.  Create MarkUp specific SQL views.
+*   Create MarkUp specific SQL views.
 
 ## 2.3. Configure Data Sources
 
@@ -138,11 +138,11 @@ Create `Product Detailed` Data Source
 
 ## 2.4. Create Data-Studio Dashboard
 
-1.  Click on the
+*   Click on the
     [link](https://datastudio.google.com/c/u/0/reporting/717c29df-0d54-421a-881a-2c629abe3e97/page/l11LB/preview)
 
-2.  Click "`Use Template`"
+*   Click "`Use Template`"
 
-3.  Choose the new "`Product Detailed`" data-source created in the previous step
+*   Choose the new "`Product Detailed`" data-source created in the previous step
 
-4.  Click "`Copy Report`"
+*   Click "`Copy Report`"

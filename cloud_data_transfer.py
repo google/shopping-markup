@@ -235,6 +235,8 @@ class CloudDataTransferUtils(object):
       start_time = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(
           days=backfill_days)
       end_time = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(days=1)
+      start_time = start_time.replace(hour=0, minute=0, second=0, microsecond=0)
+      end_time = end_time.replace(hour=0, minute=0, second=0, microsecond=0)
       parent = self.client.location_transfer_config_path(
           self.project_id, _LOCATION, transfer_config_id)
       start_time_pb = timestamp_pb2.Timestamp()
