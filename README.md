@@ -39,7 +39,7 @@ data-driven decisions to improve their feed health and shopping ads performance.
 The solution will export data from GMC and Google Ads to your Google Cloud
 Project on a daily basis and provide insights via Data Studio dashboard.
 
-<img src="images/architecture.png" width="40%">
+<img src="images/architecture.png">
 
 ## 2. Installation
 
@@ -70,7 +70,7 @@ Make sure the user running the installation has following permissions.
 
 #### 2.2.1 Check out source codes
 
-Open the [cloud shell](https://console.cloud.google.com/cloudshell) and clone
+Open the [cloud shell](https://ssh.cloud.google.com/cloudshell?shellonly=true) and clone
 the repository.
 
 ```
@@ -86,7 +86,7 @@ Please provide following inputs when running the `setup.sh` script:
 *   [Google Ads External Customer Id](https://support.google.com/google-ads/answer/1704344?hl=en)
 
 ```
-cd markup;
+cd shopping-markup;
 sh setup.sh --project_id=<project_id> --merchant_id=<merchant_id> --ads_customer_id=<ads_customer_id>
 ```
 

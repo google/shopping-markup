@@ -26,6 +26,7 @@ import pytz
 
 from google.cloud import bigquery_datatransfer_v1
 from google.cloud.bigquery_datatransfer_v1 import types
+from google.protobuf import struct_pb2
 import auth
 
 _MERCHANT_CENTER_ID = 'merchant_center'  # Data source id for Merchant Center.
@@ -145,13 +146,11 @@ class CloudDataTransferUtils(object):
       None if transfer already existed.
     """
     logging.info('Creating Merchant Center Transfer.')
-    params = {
-        'merchant_id': merchant_id,
-        'export_products': True,
-        # 'export_price_benchmarks': True
-    }
+    parameters = struct_pb2.Struct()
+    parameters['merchant_id'] = merchant_id
+    parameters['export_products'] = True
     exists = self._is_transfer_already_present(_MERCHANT_CENTER_ID,
-                                               destination_dataset, params)
+                                               destination_dataset, parameters)
     if exists:
       logging.info(
           'Data transfer for merchant id %s to destination dataset %s '
@@ -169,7 +168,7 @@ class CloudDataTransferUtils(object):
         'display_name': f'Merchant Center Transfer - {merchant_id}',
         'data_source_id': _MERCHANT_CENTER_ID,
         'destination_dataset_id': destination_dataset,
-        'params': params
+        'params': parameters
     }
     transfer_config = self.client.create_transfer_config(
         parent, transfer_config_input, authorization_code)
@@ -198,11 +197,12 @@ class CloudDataTransferUtils(object):
       None if transfer already existed.
     """
     logging.info('Creating Google Ads Transfer.')
-    params = {
-        'customer_id': customer_id
-    }
+
+    customer_id = customer_id.replace('-', '')
+    parameters = struct_pb2.Struct()
+    parameters['customer_id'] = customer_id
     exists = self._is_transfer_already_present(_GOOGLE_ADS_ID,
-                                               destination_dataset, params)
+                                               destination_dataset, parameters)
     if exists:
       logging.info(
           'Data transfer for Google Ads customer id %s to destination dataset '
@@ -220,7 +220,7 @@ class CloudDataTransferUtils(object):
         'display_name': f'Google Ads Transfer - {customer_id}',
         'data_source_id': _GOOGLE_ADS_ID,
         'destination_dataset_id': destination_dataset,
-        'params': params,
+        'params': parameters,
         'dataRefreshWindowDays': 1,
     }
     transfer_config = self.client.create_transfer_config(
