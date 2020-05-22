@@ -27,9 +27,11 @@ data-driven decisions to improve their feed health and shopping ads performance.
 
 1.  Users can find opportunities and issues at each stage of the Shopping Funnel
     both overall and detailed data cuts.
+
 2.  Richer insights with data joins to provide overall and product level
     performance information pivoted towards custom attributes (product type,
     brand, etc) for deeper insights.
+
 3.  Near real-time dashboard to share data and insights across different teams
     and areas of the business seamlessly to address issues & optimize
     performance.
@@ -72,8 +74,8 @@ Make sure the user running the installation has following permissions.
 
 #### 2.2.1 Check out source codes
 
-Open the [cloud shell](https://ssh.cloud.google.com/cloudshell?shellonly=true) and clone
-the repository.
+Open the [cloud shell](https://ssh.cloud.google.com/cloudshell?shellonly=true)
+and clone the repository.
 
 ```
   git clone https://github.com/google/shopping-markup
@@ -99,6 +101,21 @@ permissions to continue. It may ask you to open cloud authorization URL in the
 browser. Please follow the instructions as mentioned in the command line.
 
 #### Note - If the script fails when you run it for the first time, it might be due to delay in preparing Merchant account data. Please wait up to 90 minutes before re-running the script.
+
+During the installation process, the script will do following:
+
+1.  Enable Google Cloud Components and Google APIs
+
+    *   [BigQuery](https://console.cloud.google.com/bigquery)
+
+    *   [BigQuery Data Transfer](https://console.cloud.google.com/bigquery/transfers)
+
+2.  Create Google Merchant Center and Google Ads data transfers.
+
+3.  Create recurring data transfer jobs so that the latest data is imported in
+    near real time.
+
+4.  Create MarkUp specific SQL views.
 
 ## 2.3. Configure Data Sources
 

@@ -27,6 +27,7 @@ import pytz
 from google.cloud import bigquery_datatransfer_v1
 from google.cloud.bigquery_datatransfer_v1 import types
 from google.protobuf import struct_pb2
+from google.protobuf import timestamp_pb2
 import auth
 
 _MERCHANT_CENTER_ID = 'merchant_center'  # Data source id for Merchant Center.
@@ -236,7 +237,11 @@ class CloudDataTransferUtils(object):
       end_time = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(days=1)
       parent = self.client.location_transfer_config_path(
           self.project_id, _LOCATION, transfer_config_id)
-      self.client.schedule_transfer_runs(parent, start_time, end_time)
+      start_time_pb = timestamp_pb2.Timestamp()
+      end_time_pb = timestamp_pb2.Timestamp()
+      start_time_pb.FromDatetime(start_time)
+      end_time_pb.FromDatetime(end_time)
+      self.client.schedule_transfer_runs(parent, start_time_pb, end_time_pb)
     return transfer_config
 
   def _get_data_source(self, data_source_id: str) -> types.DataSource:
