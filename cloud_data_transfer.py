@@ -83,7 +83,7 @@ class CloudDataTransferUtils(object):
     while True:
       transfer_config_path = self.client.location_transfer_config_path(
           self.project_id, _LOCATION, transfer_config_id)
-      response = self.client.get_transfer_run(transfer_config_path)
+      response = self.client.list_transfer_runs(transfer_config_path)
       latest_transfer = next(response)
       if latest_transfer.state == 'SUCCEEDED':
         logging.info('Transfer %s was successful.', transfer_config_name)

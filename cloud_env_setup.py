@@ -64,7 +64,7 @@ def create_dataset_if_not_exists(project_id: str, dataset_id: str) -> None:
     dataset_id: BigQuery dataset id.
   """
   # Construct a BigQuery client object.
-  client = bigquery.Client()
+  client = bigquery.Client(project=project_id)
   fully_qualified_dataset_id = f'{project_id}.{dataset_id}'
   try:
     client.get_dataset(fully_qualified_dataset_id)
