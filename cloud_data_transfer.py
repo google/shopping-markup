@@ -20,7 +20,7 @@
 import datetime
 import logging
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 import pytz
 
@@ -81,8 +81,9 @@ class CloudDataTransferUtils(object):
     transfer_config_id = transfer_config_name.split('/')[-1]
     poll_counter = 0  # Counter to keep polling count.
     while True:
-      response = self.client.location_transfer_config_path(
+      transfer_config_path = self.client.location_transfer_config_path(
           self.project_id, _LOCATION, transfer_config_id)
+      response = self.client.get_transfer_run(transfer_config_path)
       latest_transfer = next(response)
       if latest_transfer.state == 'SUCCEEDED':
         logging.info('Transfer %s was successful.', transfer_config_name)
@@ -105,10 +106,10 @@ class CloudDataTransferUtils(object):
         logging.error(error_message)
         raise DataTransferError(error_message)
 
-  def _is_transfer_already_present(self, data_source_id: str,
-                                   destination_dataset_id: str,
-                                   params: Dict[str, str]) -> bool:
-    """Checks if given data transfer already exists.
+  def _get_existing_transfer(self, data_source_id: str,
+                             destination_dataset_id: str,
+                             params: Dict[str, str]) -> bool:
+    """Gets data transfer if it already exists.
 
     Args:
       data_source_id: Data source id.
@@ -116,7 +117,8 @@ class CloudDataTransferUtils(object):
       params: Data transfer specific parameters.
 
     Returns:
-      True if the transfer already exists, False otherwise.
+      Data Transfer if the transfer already exists.
+      None otherwise.
     """
     parent = self.client.location_path(self.project_id, _LOCATION)
     for transfer_config in self.client.list_transfer_configs(parent):
@@ -124,15 +126,17 @@ class CloudDataTransferUtils(object):
         continue
       if transfer_config.destination_dataset_id != destination_dataset_id:
         continue
+      has_param_configs = True
       for key, value in params.items():
         if transfer_config.params[key] != value:
-          continue
-      return True
-    return False
+          has_param_configs = False
+          break
+      if has_param_configs:
+        return transfer_config
+    return None
 
   def create_merchant_center_transfer(
-      self, merchant_id: str,
-      destination_dataset: str) -> Optional[types.TransferConfig]:
+      self, merchant_id: str, destination_dataset: str) -> types.TransferConfig:
     """Creates a new merchant center transfer.
 
     Merchant center allows retailers to store product info into Google. This
@@ -143,20 +147,20 @@ class CloudDataTransferUtils(object):
       destination_dataset: BigQuery dataset id.
 
     Returns:
-      Newly created transfer config.
-      None if transfer already existed.
+      Transfer config.
     """
     logging.info('Creating Merchant Center Transfer.')
     parameters = struct_pb2.Struct()
     parameters['merchant_id'] = merchant_id
     parameters['export_products'] = True
-    exists = self._is_transfer_already_present(_MERCHANT_CENTER_ID,
-                                               destination_dataset, parameters)
-    if exists:
+    data_transfer_config = self._get_existing_transfer(_MERCHANT_CENTER_ID,
+                                                       destination_dataset,
+                                                       parameters)
+    if data_transfer_config:
       logging.info(
           'Data transfer for merchant id %s to destination dataset %s '
           'already exists.', merchant_id, destination_dataset)
-      return
+      return data_transfer_config
     logging.info(
         'Creating data transfer for merchant id %s to destination dataset %s',
         merchant_id, destination_dataset)
@@ -182,7 +186,7 @@ class CloudDataTransferUtils(object):
       self,
       customer_id: str,
       destination_dataset: str,
-      backfill_days: int = 30) -> Optional[types.TransferConfig]:
+      backfill_days: int = 30) -> types.TransferConfig:
     """Creates a new Google Ads transfer.
 
     This method creates a data transfer config to copy Google Ads data to
@@ -194,21 +198,20 @@ class CloudDataTransferUtils(object):
       backfill_days: Number of days to backfill.
 
     Returns:
-      Newly created transfer config.
-      None if transfer already existed.
+      Transfer config.
     """
     logging.info('Creating Google Ads Transfer.')
 
     customer_id = customer_id.replace('-', '')
     parameters = struct_pb2.Struct()
     parameters['customer_id'] = customer_id
-    exists = self._is_transfer_already_present(_GOOGLE_ADS_ID,
+    data_transfer_config = self._get_existing_transfer(_GOOGLE_ADS_ID,
                                                destination_dataset, parameters)
-    if exists:
+    if data_transfer_config:
       logging.info(
           'Data transfer for Google Ads customer id %s to destination dataset '
           '%s already exists.', customer_id, destination_dataset)
-      return
+      return data_transfer_config
     logging.info(
         'Creating data transfer for Google Ads customer id %s to destination '
         'dataset %s', customer_id, destination_dataset)

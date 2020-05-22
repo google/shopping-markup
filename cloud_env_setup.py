@@ -212,12 +212,10 @@ def main():
       args.merchant_id, args.dataset_id)
   ads_config = data_transfer.create_google_ads_transfer(args.ads_customer_id,
                                                         args.dataset_id)
-  if merchant_center_config:
-    data_transfer.wait_for_transfer_completion(merchant_center_config)
-    logging.info('The GMC data have been successfully transferred.')
-  if ads_config:
-    data_transfer.wait_for_transfer_completion(ads_config)
-    logging.info('The Google Ads data have been successfully transferred.')
+  data_transfer.wait_for_transfer_completion(merchant_center_config)
+  logging.info('The GMC data have been successfully transferred.')
+  data_transfer.wait_for_transfer_completion(ads_config)
+  logging.info('The Google Ads data have been successfully transferred.')
   load_language_codes(args.project_id, args.dataset_id)
   load_geo_targets(args.project_id, args.dataset_id)
   logging.info('Creating MarkUp specific views.')
