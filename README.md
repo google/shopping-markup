@@ -63,7 +63,9 @@ You may skip this step if you already have a GCP account with billing enaled.
 Make sure the user running the installation has following permissions.
 
 *   [Standard Access For GMC](https://support.google.com/merchants/answer/1637190?hl=en)
+
 *   [Standard Access For Google Ads](https://support.google.com/google-ads/answer/7476552?hl=en)
+
 *   [Editor(or Owner) Role in Google Cloud Project](https://cloud.google.com/iam/docs/understanding-roles)
 
 ### 2.2. Cloud environment setup
@@ -82,7 +84,9 @@ the repository.
 Please provide following inputs when running the `setup.sh` script:
 
 *   [GCP Project Id](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
+
 *   [Google Merchant Center Id](https://support.google.com/merchants/answer/188924?hl=en)
+
 *   [Google Ads External Customer Id](https://support.google.com/google-ads/answer/1704344?hl=en)
 
 ```
@@ -102,11 +106,16 @@ Create `Product Detailed` Data Source
 
 *   Click on the
     [link](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
+
 *   Make sure you are using BigQuery connector. If not choose "`BigQuery`" from
     the list of available connectors.
+
 *   Search your GCP Project Id under My Projects.
+
 *   Under Dataset, click on "`markup`"
+
 *   Under Table, choose "`product_detailed`"
+
 *   Click `Connect` on the top right corner and wait for the data-source to be
     created
 
@@ -114,6 +123,9 @@ Create `Product Detailed` Data Source
 
 1.  Click on the
     [link](https://datastudio.google.com/c/u/0/reporting/717c29df-0d54-421a-881a-2c629abe3e97/page/l11LB/preview)
+
 2.  Click "`Use Template`"
+
 3.  Choose the new "`Product Detailed`" data-source created in the previous step
+
 4.  Click "`Copy Report`"

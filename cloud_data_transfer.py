@@ -221,7 +221,7 @@ class CloudDataTransferUtils(object):
         'data_source_id': _GOOGLE_ADS_ID,
         'destination_dataset_id': destination_dataset,
         'params': parameters,
-        'default_data_refresh_window_days': 1,
+        'data_refresh_window_days': 1,
     }
     transfer_config = self.client.create_transfer_config(
         parent, transfer_config_input, authorization_code)
