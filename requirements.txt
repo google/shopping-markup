@@ -1,2 +1,5 @@
 google-cloud-bigquery==1.24
 google-api-python-client==1.8
+google-cloud-bigquery-datatransfer==1.0
+grpcio==1.29
+grpcio-tools==1.29

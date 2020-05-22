@@ -2,85 +2,115 @@
 
 Disclaimer: This is not an officially supported Google product.
 
-*   [Overview](#overview)
-*   [Step 1: Environment setup](#step-1-environment-setup)
-*   [Step 2: Cloud environment setup](#step-2-cloud-environment-setup)
-*   [Step 3: Configure Data Sources](#step-3-configure-data-sources)
-*   [Step 4: Create Data-Studio Dashboard](#step-4-data-studio-dashboard)
+MarkUp is a tool to enable retailers grow their business using
+[Google Merchant Center](https://www.google.com/retail/solutions/merchant-center/)
+by taking actionable data-driven decisions to optimize shopping feed health and
+ads performance.
 
-## Overview
+## Contents
+
+*   [1. Overview](#1-overview)
+    *   [1.1. Value Proposition](#1-1-value-proposition)
+    *   [1.2. Solution Architecture](#solution-architecture)
+*   [2. Installation](#2-installation)
+    *   [2.1. Environment Setup](#environment-setup)
+    *   [2.2. Cloud Environment Setup](#cloud-environment-setup)
+    *   [2.3. Configure Data Sources](#configure-data-sources)
+    *   [2.4. Create Data-Studio Dashboard](#data-studio-dashboard)
+
+## 1. Overview
 
 MarkUp solution is built for Google Shopping customers to take actionable
 data-driven decisions to improve their feed health and shopping ads performance.
 
-## Step 1: Environment setup
+### 1.1. Value Proposition
 
-1.  [Create a GCP account](https://cloud.google.com/?authuser=1) (if you don't
-    have one already!)
+1.  Users can find opportunities and issues at each stage of the Shopping Funnel
+    both overall and detailed data cuts.
+2.  Richer insights with data joins to provide overall and product level
+    performance information pivoted towards custom attributes (product type,
+    brand, etc) for deeper insights.
+3.  Near real-time dashboard to share data and insights across different teams
+    and areas of the business seamlessly to address issues & optimize
+    performance.
 
-2.  [Create a new project](https://console.cloud.google.com/cloud-resource-manager)
+### 1.2 Solution Architecture
 
-    *   Click Create Project.
-    *   In the New Project window that appears, enter a project name and select
-        a billing account as applicable.
-    *   When you're finished entering new project details, click Create.
+The solution will export data from GMC and Google Ads to your Google Cloud
+Project on a daily basis and provide insights via Data Studio dashboard.
 
-3.  [Open cloud shell](https://console.cloud.google.com/cloudshell) and clone
-    the repository.
+<img src="images/architecture.png" width="40%">
 
-    *   Create a cookie for the Git client to use by visiting
-        [https://cse.googlesource.com/new-password](https://cse.googlesource.com/new-password)
-        and following the instructions.
-    *   Execute following command.
+## 2. Installation
 
-    ```
-      git clone https://cse.googlesource.com/solutions/markup
-    ```
+### 2.1. Google Cloud Platform(GCP) setup
 
-## Step 2: Cloud environment setup
+#### 2.1.1 Create a GCP project with billing account
 
-1.  Make sure the user executing next step has following permissions.
+You may skip this step if you already have a GCP account with billing enaled.
 
-    *   [Standard Access For GMC](https://support.google.com/merchants/answer/1637190?hl=en)
-    *   [Standard Access For Google Ads](https://support.google.com/google-ads/answer/7476552?hl=en)
-    *   [Editor(or Owner) Role in Google Cloud Project](https://cloud.google.com/iam/docs/understanding-roles)
+1.  How to [Create a GCP account](https://cloud.google.com/?authuser=1) (if you
+    don't have one already!)
 
-2.  Perform environment setup after providing inputs.
+2.  How to
+    [Create and Manage Projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
 
-    *   `project_id`:
-        [GCP Project Id](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
-    *   `merchant_id`:
-        [Google Merchant Center Id](https://support.google.com/merchants/answer/188924?hl=en)
-    *   `ads_customer_id`:
-        [Google Ads External Customer Id](https://support.google.com/google-ads/answer/1704344?hl=en)
+3.  How to
+    [Create, Modify, or Close Your Billing Account](https://cloud.google.com/billing/docs/how-to/manage-billing-account)
 
-    During the installation, the script will check whether does current user
-    have enough permissions to continue. It may ask you to open cloud
-    authorization URL in the browser. Please follow the instructions as
-    mentioned in the command line.
+#### 2.1.2 Check the permissions
 
-    ####If the script fails when you run it for the first time, it might be due to delay in preparing Merchant account data. Please wait up to 90 minutes before re-running the script.####
+Make sure the user running the installation has following permissions.
 
-    ```
-      cd markup
-      sh setup.sh --project_id=<project_id> --merchant_id=<merchant_id> --ads_customer_id=<ads_customer_id>
-    ```
+*   [Standard Access For GMC](https://support.google.com/merchants/answer/1637190?hl=en)
+*   [Standard Access For Google Ads](https://support.google.com/google-ads/answer/7476552?hl=en)
+*   [Editor(or Owner) Role in Google Cloud Project](https://cloud.google.com/iam/docs/understanding-roles)
 
-## Step 3: Configure Data Source
+### 2.2. Cloud environment setup
 
-1.  Create `Product Detailed` Data Source
+#### 2.2.1 Check out source codes
 
-    *   Click on the
-        [link](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
-    *   Make sure you are using BigQuery connector. If not choose "`BigQuery`"
-        from the list of available connectors.
-    *   Search "`project_id`" under My Projects
-    *   Under Dataset, click on "`markup`"
-    *   Under Table, choose "`product_detailed`"
-    *   Click `Connect` on the top right corner and wait for the data-source to
-        be created
+Open the [cloud shell](https://console.cloud.google.com/cloudshell) and clone
+the repository.
 
-## Step 4: Create Data-Studio Dashboard
+```
+  git clone https://github.com/google/shopping-markup
+```
+
+#### 2.2.2 Run install script
+
+Please provide following inputs when running the `setup.sh` script:
+
+*   [GCP Project Id](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
+*   [Google Merchant Center Id](https://support.google.com/merchants/answer/188924?hl=en)
+*   [Google Ads External Customer Id](https://support.google.com/google-ads/answer/1704344?hl=en)
+
+```
+cd markup;
+sh setup.sh --project_id=<project_id> --merchant_id=<merchant_id> --ads_customer_id=<ads_customer_id>
+```
+
+When installing, the script will check whether does current user have enough
+permissions to continue. It may ask you to open cloud authorization URL in the
+browser. Please follow the instructions as mentioned in the command line.
+
+#### Note - If the script fails when you run it for the first time, it might be due to delay in preparing Merchant account data. Please wait up to 90 minutes before re-running the script.
+
+## 2.3. Configure Data Sources
+
+Create `Product Detailed` Data Source
+
+*   Click on the
+    [link](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
+*   Make sure you are using BigQuery connector. If not choose "`BigQuery`" from
+    the list of available connectors.
+*   Search your GCP Project Id under My Projects.
+*   Under Dataset, click on "`markup`"
+*   Under Table, choose "`product_detailed`"
+*   Click `Connect` on the top right corner and wait for the data-source to be
+    created
+
+## 2.4. Create Data-Studio Dashboard
 
 1.  Click on the
     [link](https://datastudio.google.com/c/u/0/reporting/717c29df-0d54-421a-881a-2c629abe3e97/page/l11LB/preview)
