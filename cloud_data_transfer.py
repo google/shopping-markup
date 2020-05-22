@@ -35,6 +35,9 @@ _GOOGLE_ADS_ID = 'adwords'  # Data source id for Google Ads.
 _SLEEP_SECONDS = 10  # Seconds to sleep before checking resource status.
 _MAX_POLL_COUNTER = 200
 _LOCATION = 'us'  # The only location available today for BQ Data Transfer.
+_SUCCESS_STATE = 3
+_FAILED_STATE = 4
+_CANCELLED_STATE = 5
 
 
 class Error(Exception):
@@ -85,12 +88,11 @@ class CloudDataTransferUtils(object):
           self.project_id, _LOCATION, transfer_config_id)
       response = self.client.list_transfer_runs(transfer_config_path)
       for latest_transfer in response:
-        latest_transfer = next(response)
-        if latest_transfer.state == 'SUCCEEDED':
+        if latest_transfer.state == _SUCCESS_STATE:
           logging.info('Transfer %s was successful.', transfer_config_name)
           return
-        if (latest_transfer.state == 'FAILED' or
-            latest_transfer.state == 'CANCELLED'):
+        if (latest_transfer.state == _FAILED_STATE or
+            latest_transfer.state == _CANCELLED_STATE):
           error_message = ('Transfer %s was not successful. Error - %s.',
                            transfer_config_name,
                            latest_transfer['errorStatus']['message'])
@@ -207,7 +209,8 @@ class CloudDataTransferUtils(object):
     parameters = struct_pb2.Struct()
     parameters['customer_id'] = customer_id
     data_transfer_config = self._get_existing_transfer(_GOOGLE_ADS_ID,
-                                               destination_dataset, parameters)
+                                                       destination_dataset,
+                                                       parameters)
     if data_transfer_config:
       logging.info(
           'Data transfer for Google Ads customer id %s to destination dataset '
