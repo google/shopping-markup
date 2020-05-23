@@ -212,8 +212,14 @@ def main():
       args.merchant_id, args.dataset_id)
   ads_config = data_transfer.create_google_ads_transfer(args.ads_customer_id,
                                                         args.dataset_id)
-  data_transfer.wait_for_transfer_completion(merchant_center_config)
-  logging.info('The GMC data have been successfully transferred.')
+  try:
+    data_transfer.wait_for_transfer_completion(merchant_center_config)
+    logging.info('The GMC data have been successfully transferred.')
+  except cloud_data_transfer.DataTransferError:
+    logging.error('If you have just created GMC transfer - you may need to'
+                  'wait for up to 90 minutes before the data of your Merchant'
+                  'account are prepared and available for the transfer.')
+    raise
   data_transfer.wait_for_transfer_completion(ads_config)
   logging.info('The Google Ads data have been successfully transferred.')
   load_language_codes(args.project_id, args.dataset_id)

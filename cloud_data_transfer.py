@@ -98,14 +98,8 @@ class CloudDataTransferUtils(object):
         return
       if (latest_transfer.state == _FAILED_STATE or
           latest_transfer.state == _CANCELLED_STATE):
-        error_message = (
-            'Transfer %s was not successful. If you have just created this '
-            'transfer - you may need to wait for up to 90 minutes before the '
-            'data of your Merchant account are prepared and available for the '
-            'transfer.',
-            transfer_config_name)
-        for element in self.client.list_transfer_logs(latest_transfer.name):
-          logging.info(element.message_text)
+        error_message = (f'Transfer {transfer_config_name} was not successful. '
+                         f'Error - {latest_transfer.error_status.}')
         logging.error(error_message)
         raise DataTransferError(error_message)
       logging.info(
@@ -144,7 +138,7 @@ class CloudDataTransferUtils(object):
         if transfer_config.params[key] != value:
           has_param_configs = False
           break
-      if has_param_configs:
+      if has_param_configs and transfer_config.state == _SUCCESS_STATE:
         return transfer_config
     return None
 
