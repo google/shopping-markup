@@ -32,8 +32,8 @@ import auth
 
 _MERCHANT_CENTER_ID = 'merchant_center'  # Data source id for Merchant Center.
 _GOOGLE_ADS_ID = 'adwords'  # Data source id for Google Ads.
-_SLEEP_SECONDS = 10  # Seconds to sleep before checking resource status.
-_MAX_POLL_COUNTER = 200
+_SLEEP_SECONDS = 60  # Seconds to sleep before checking resource status.
+_MAX_POLL_COUNTER = 100
 _LOCATION = 'us'  # The only location available today for BQ Data Transfer.
 _SUCCESS_STATE = 3
 _FAILED_STATE = 4
