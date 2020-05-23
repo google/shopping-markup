@@ -87,27 +87,37 @@ class CloudDataTransferUtils(object):
       transfer_config_path = self.client.location_transfer_config_path(
           self.project_id, _LOCATION, transfer_config_id)
       response = self.client.list_transfer_runs(transfer_config_path)
-      for latest_transfer in response:
-        if latest_transfer.state == _SUCCESS_STATE:
-          logging.info('Transfer %s was successful.', transfer_config_name)
-          return
-        if (latest_transfer.state == _FAILED_STATE or
-            latest_transfer.state == _CANCELLED_STATE):
-          error_message = ('Transfer %s was not successful. Error - %s.',
-                           transfer_config_name,
-                           latest_transfer['errorStatus']['message'])
-          logging.error(error_message)
-          raise DataTransferError(error_message)
-        logging.info(
-            'Transfer %s still in progress. Sleeping for %s seconds before '
-            'checking again.', transfer_config_name, _SLEEP_SECONDS)
-        time.sleep(_SLEEP_SECONDS)
-        poll_counter += 1
-        if poll_counter >= _MAX_POLL_COUNTER:
-          error_message = (f'Transfer {transfer_config_name} is taking too long'
-                           ' to finish. Hence failing the request.')
-          logging.error(error_message)
-          raise DataTransferError(error_message)
+      latest_transfer = None
+      for transfer in response:
+        latest_transfer = transfer
+        break
+      if not latest_transfer:
+        return
+      if latest_transfer.state == _SUCCESS_STATE:
+        logging.info('Transfer %s was successful.', transfer_config_name)
+        return
+      if (latest_transfer.state == _FAILED_STATE or
+          latest_transfer.state == _CANCELLED_STATE):
+        error_message = (
+            'Transfer %s was not successful. If you have just created this '
+            'transfer - you may need to wait for up to 90 minutes before the '
+            'data of your Merchant account are prepared and available for the '
+            'transfer.',
+            transfer_config_name)
+        for element in self.client.list_transfer_logs(latest_transfer.name):
+          logging.info(element.message_text)
+        logging.error(error_message)
+        raise DataTransferError(error_message)
+      logging.info(
+          'Transfer %s still in progress. Sleeping for %s seconds before '
+          'checking again.', transfer_config_name, _SLEEP_SECONDS)
+      time.sleep(_SLEEP_SECONDS)
+      poll_counter += 1
+      if poll_counter >= _MAX_POLL_COUNTER:
+        error_message = (f'Transfer {transfer_config_name} is taking too long'
+                         ' to finish. Hence failing the request.')
+        logging.error(error_message)
+        raise DataTransferError(error_message)
 
   def _get_existing_transfer(self, data_source_id: str,
                              destination_dataset_id: str,
