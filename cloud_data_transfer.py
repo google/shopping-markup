@@ -99,7 +99,7 @@ class CloudDataTransferUtils(object):
       if (latest_transfer.state == _FAILED_STATE or
           latest_transfer.state == _CANCELLED_STATE):
         error_message = (f'Transfer {transfer_config_name} was not successful. '
-                         f'Error - {latest_transfer.error_status.}')
+                         f'Error - {latest_transfer.error_status}')
         logging.error(error_message)
         raise DataTransferError(error_message)
       logging.info(
