@@ -263,7 +263,9 @@ class CloudDataTransferUtils(object):
     Args:
       data_source_id: Data source id.
     """
-    return self.client.get_data_source(data_source_id)
+    name = self.client.location_data_source_path(self.project_id, _LOCATION,
+                                                 data_source_id)
+    return self.client.get_data_source(name)
 
   def _check_valid_credentials(self, data_source_id: str) -> bool:
     """Returns true if valid credentials exist for the given data source.
