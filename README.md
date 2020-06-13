@@ -72,7 +72,12 @@ Make sure the user running the installation has following permissions.
 
 ### 2.2. Cloud environment setup
 
-#### 2.2.1 Check out source codes
+#### 2.2.1 Setup local environment.
+[Download and authenticate gcloud.](https://cloud.google.com/sdk/#Quick_Start)
+
+Alternatively, if the GMC account has less than 10 Million products, you could use [Cloud Shell](https://ssh.cloud.google.com/cloudshell?shellonly=true), which comes with gcloud already installed. The cloud shell disconnects after 1 hour and hence we recommend using local environment for large accounts since they could take more than 1 hour to finish the installation.
+
+#### 2.2.2 Check out source codes
 
 Open the [cloud shell](https://ssh.cloud.google.com/cloudshell?shellonly=true)
 and clone the repository.
@@ -81,7 +86,7 @@ and clone the repository.
   git clone https://github.com/google/shopping-markup
 ```
 
-#### 2.2.2 Run install script
+#### 2.2.3 Run install script
 
 Please provide following inputs when running the `setup.sh` script:
 

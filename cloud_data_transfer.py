@@ -209,7 +209,6 @@ class CloudDataTransferUtils(object):
     """
     logging.info('Creating Google Ads Transfer.')
 
-    customer_id = customer_id.replace('-', '')
     parameters = struct_pb2.Struct()
     parameters['customer_id'] = customer_id
     data_transfer_config = self._get_existing_transfer(_GOOGLE_ADS_ID,

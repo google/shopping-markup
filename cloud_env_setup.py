@@ -202,6 +202,7 @@ def parse_arguments() -> argparse.Namespace:
 
 def main():
   args = parse_arguments()
+  ads_customer_id = args.ads_customer_id.replace('-', '')
   data_transfer = cloud_data_transfer.CloudDataTransferUtils(args.project_id)
   logging.info('Enabling APIs.')
   enable_apis(args.project_id)
@@ -210,7 +211,7 @@ def main():
   create_dataset_if_not_exists(args.project_id, args.dataset_id)
   merchant_center_config = data_transfer.create_merchant_center_transfer(
       args.merchant_id, args.dataset_id)
-  ads_config = data_transfer.create_google_ads_transfer(args.ads_customer_id,
+  ads_config = data_transfer.create_google_ads_transfer(ads_customer_id,
                                                         args.dataset_id)
   try:
     logging.info('Checking the GMC data transfer status.')
@@ -228,7 +229,7 @@ def main():
   load_geo_targets(args.project_id, args.dataset_id)
   logging.info('Creating MarkUp specific views.')
   execute_queries(args.project_id, args.dataset_id, args.merchant_id,
-                  args.ads_customer_id)
+                  ads_customer_id)
   logging.info('Created MarkUp specific views.')
 
 
