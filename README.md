@@ -75,7 +75,7 @@ Make sure the user running the installation has following permissions.
 #### 2.2.1 Setup local environment.
 [Download and authenticate gcloud.](https://cloud.google.com/sdk/#Quick_Start)
 
-Alternatively, if the GMC account has less than 10 Million products, you could use [Cloud Shell](https://ssh.cloud.google.com/cloudshell?shellonly=true), which comes with gcloud already installed. The cloud shell disconnects after 1 hour and hence we recommend using local environment for large accounts since they could take more than 1 hour to finish the installation.
+Alternatively, if the GMC account has less than 50 Million products, you could use [Cloud Shell](https://ssh.cloud.google.com/cloudshell?shellonly=true), which comes with gcloud already installed. The cloud shell disconnects after 1 hour and hence we recommend using local environment for large accounts since they could take more than 1 hour to finish the installation.
 
 #### 2.2.2 Check out source codes
 
