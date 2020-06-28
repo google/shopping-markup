@@ -79,7 +79,7 @@ Alternatively, if the GMC account has less than 50 Million products, you could u
 
 #### 2.2.2 Check out source codes
 
-Open the [cloud shell](https://ssh.cloud.google.com/cloudshell?shellonly=true)
+Open the [cloud shell](https://ssh.cloud.google.com/cloudshell?shellonly=true) or your terminal(if running locally)
 and clone the repository.
 
 ```
