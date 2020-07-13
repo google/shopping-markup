@@ -33,7 +33,7 @@ def _get_config(config_key: str) -> str:
   """
 
   with open('config.yaml') as config_file:
-    configs = yaml.safe_load(config_file, Loader=yaml.FullLoader)
+    configs = yaml.safe_load(config_file)
     return configs[config_key]
 
 
