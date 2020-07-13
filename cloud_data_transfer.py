@@ -29,12 +29,12 @@ from google.cloud.bigquery_datatransfer_v1 import types
 from google.protobuf import struct_pb2
 from google.protobuf import timestamp_pb2
 import auth
+import config_parser
 
 _MERCHANT_CENTER_ID = 'merchant_center'  # Data source id for Merchant Center.
 _GOOGLE_ADS_ID = 'adwords'  # Data source id for Google Ads.
 _SLEEP_SECONDS = 60  # Seconds to sleep before checking resource status.
 _MAX_POLL_COUNTER = 100
-_LOCATION = 'us'  # The only location available today for BQ Data Transfer.
 _SUCCESS_STATE = 4
 _FAILED_STATE = 5
 _CANCELLED_STATE = 6
@@ -85,7 +85,7 @@ class CloudDataTransferUtils(object):
     poll_counter = 0  # Counter to keep polling count.
     while True:
       transfer_config_path = self.client.location_transfer_config_path(
-          self.project_id, _LOCATION, transfer_config_id)
+          self.project_id, config_parser.get_dataset_location(), transfer_config_id)
       response = self.client.list_transfer_runs(transfer_config_path)
       latest_transfer = None
       for transfer in response:
@@ -127,7 +127,7 @@ class CloudDataTransferUtils(object):
       Data Transfer if the transfer already exists.
       None otherwise.
     """
-    parent = self.client.location_path(self.project_id, _LOCATION)
+    parent = self.client.location_path(self.project_id, config_parser.get_dataset_location())
     for transfer_config in self.client.list_transfer_configs(parent):
       if transfer_config.data_source_id != data_source_id:
         continue
@@ -175,7 +175,8 @@ class CloudDataTransferUtils(object):
     authorization_code = None
     if not has_valid_credentials:
       authorization_code = self._get_authorization_code(_MERCHANT_CENTER_ID)
-    parent = self.client.location_path(self.project_id, _LOCATION)
+    dataset_location = config_parser.get_dataset_location()
+    parent = self.client.location_path(self.project_id, dataset_location)
     transfer_config_input = {
         'display_name': f'Merchant Center Transfer - {merchant_id}',
         'data_source_id': _MERCHANT_CENTER_ID,
@@ -226,7 +227,8 @@ class CloudDataTransferUtils(object):
     authorization_code = None
     if not has_valid_credentials:
       authorization_code = self._get_authorization_code(_GOOGLE_ADS_ID)
-    parent = self.client.location_path(self.project_id, _LOCATION)
+    dataset_location = config_parser.get_dataset_location()
+    parent = self.client.location_path(self.project_id, dataset_location)
     transfer_config_input = {
         'display_name': f'Google Ads Transfer - {customer_id}',
         'data_source_id': _GOOGLE_ADS_ID,
@@ -248,7 +250,7 @@ class CloudDataTransferUtils(object):
       start_time = start_time.replace(hour=0, minute=0, second=0, microsecond=0)
       end_time = end_time.replace(hour=0, minute=0, second=0, microsecond=0)
       parent = self.client.location_transfer_config_path(
-          self.project_id, _LOCATION, transfer_config_id)
+          self.project_id, dataset_location, transfer_config_id)
       start_time_pb = timestamp_pb2.Timestamp()
       end_time_pb = timestamp_pb2.Timestamp()
       start_time_pb.FromDatetime(start_time)
@@ -262,7 +264,8 @@ class CloudDataTransferUtils(object):
     Args:
       data_source_id: Data source id.
     """
-    name = self.client.location_data_source_path(self.project_id, _LOCATION,
+    dataset_location = config_parser.get_dataset_location()
+    name = self.client.location_data_source_path(self.project_id, dataset_location,
                                                  data_source_id)
     return self.client.get_data_source(name)
 
@@ -272,7 +275,8 @@ class CloudDataTransferUtils(object):
     Args:
       data_source_id: Data source id.
     """
-    name = self.client.location_data_source_path(self.project_id, _LOCATION,
+    dataset_location = config_parser.get_dataset_location()
+    name = self.client.location_data_source_path(self.project_id, dataset_location,
                                                  data_source_id)
     response = self.client.check_valid_creds(name)
     return response.has_valid_creds

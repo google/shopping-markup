@@ -31,9 +31,8 @@ from google.cloud import bigquery
 from google.cloud import exceptions
 from plugins.cloud_utils import cloud_api
 import cloud_data_transfer
+import config_parser
 
-
-_DEFAULT_DATASET_LOCATION = 'US'
 
 # Set logging level.
 logging.getLogger().setLevel(logging.INFO)
@@ -72,7 +71,7 @@ def create_dataset_if_not_exists(project_id: str, dataset_id: str) -> None:
   except exceptions.NotFound:
     logging.info('Dataset %s is not found.', fully_qualified_dataset_id)
     dataset = bigquery.Dataset(fully_qualified_dataset_id)
-    dataset.location = _DEFAULT_DATASET_LOCATION
+    dataset.location = config_parser.get_dataset_location()
     client.create_dataset(dataset)
     logging.info('Dataset %s created.', fully_qualified_dataset_id)
 
