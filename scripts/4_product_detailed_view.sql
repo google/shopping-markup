@@ -16,13 +16,13 @@ CREATE OR REPLACE VIEW
   `{project_id}.{dataset}.product_detailed` AS
 WITH
   ProductIssuesTable AS (
-  SELECT
-    merchant_id,
-    unique_product_id,
-    servability
-  FROM
-    `{project_id}.{dataset}.product_view`,
-    UNNEST(issues) issues ),
+    SELECT
+      merchant_id,
+      unique_product_id,
+      servability
+    FROM
+      `{project_id}.{dataset}.product_view`,
+      UNNEST(issues) issues ),
   ProductData AS (
   SELECT
     COALESCE(product_view.aggregator_id, product_view.merchant_id) AS account_id,
@@ -30,6 +30,7 @@ WITH
     product_view.merchant_id AS sub_account_id,
     product_view.unique_product_id,
     MAX(product_view.offer_id) AS offer_id,
+    MAX(product_view.channel) AS channel,
     MAX(product_view.in_stock) AS in_stock,
     MIN(CASE
         WHEN LOWER(destinations.status) <> 'approved' THEN 0
@@ -56,9 +57,9 @@ WITH
     MAX(custom_labels.label_3) AS custom_label_3,
     MAX(custom_labels.label_4) AS custom_label_4,
     MAX(product_view.brand) AS brand,
-    SUM(product_metrics_view.impressions_30_days) AS impressions_30_days,
-    SUM(product_metrics_view.clicks_30_days) AS clicks_30_days,
-    SUM(product_metrics_view.cost_30_days) AS cost_30_days,
+    MAX(product_metrics_view.impressions_30_days) AS impressions_30_days,
+    MAX(product_metrics_view.clicks_30_days) AS clicks_30_days,
+    MAX(product_metrics_view.cost_30_days) AS cost_30_days,
     ANY_VALUE(issues) AS issues
   FROM
     `{project_id}.{dataset}.product_view` product_view,
