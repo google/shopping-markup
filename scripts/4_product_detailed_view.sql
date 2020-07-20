@@ -39,11 +39,14 @@ WITH
     END
       ) AS is_approved,
     MIN(CASE
-        WHEN servability IS NOT NULL AND LOWER(servability) <> 'unaffected' THEN 0
-      ELSE
-      1
-    END
-      ) AS is_targeted,
+        WHEN
+          servability IS NOT NULL
+          AND LOWER(servability) <> 'unaffected'
+          AND LOWER(servability) <> 'demoted'
+          THEN 0
+        ELSE
+          1
+      END) AS is_targeted,
     MAX(title) AS title,
     MAX(link) AS item_url,
     MAX(product_type_l1) AS product_type_l1,
