@@ -144,7 +144,7 @@ Create `Product Detailed` Data Source
 ## 2.4. Create Data-Studio Dashboard
 
 *   Click on the
-    [link](https://datastudio.google.com/u/0/reporting/b6ada6fa-9b6d-4fca-9621-f217a58a6ae2/page/l11LB/preview)
+    [link](https://datastudio.google.com/reporting/b6ada6fa-9b6d-4fca-9621-f217a58a6ae2/page/l11LB/preview)
 
 *   Click "`Use Template`"
 
