@@ -64,6 +64,11 @@ AS (
     IFNULL(SPLIT(product_type, '>')[SAFE_OFFSET(2)], 'N/A') AS product_type_l3,
     IFNULL(SPLIT(product_type, '>')[SAFE_OFFSET(3)], 'N/A') AS product_type_l4,
     IFNULL(SPLIT(product_type, '>')[SAFE_OFFSET(4)], 'N/A') AS product_type_l5,
+    IFNULL(SPLIT(google_product_category_path, '>')[SAFE_OFFSET(0)], 'N/A') AS google_product_category_l1,
+    IFNULL(SPLIT(google_product_category_path, '>')[SAFE_OFFSET(1)], 'N/A') AS google_product_category_l2,
+    IFNULL(SPLIT(google_product_category_path, '>')[SAFE_OFFSET(2)], 'N/A') AS google_product_category_l3,
+    IFNULL(SPLIT(google_product_category_path, '>')[SAFE_OFFSET(3)], 'N/A') AS google_product_category_l4,
+    IFNULL(SPLIT(google_product_category_path, '>')[SAFE_OFFSET(4)], 'N/A') AS google_product_category_l5,
     IF(availability = 'in stock', 1, 0) AS in_stock
   FROM
     `{project_id}.{dataset}.Products_{merchant_id}`

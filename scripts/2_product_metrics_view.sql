@@ -42,7 +42,9 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.product_metrics_view`
         offerid) AS product_id,
       SUM(impressions) AS impressions_30_days,
       SUM(clicks) AS clicks_30_days,
-      SUM(cost) AS cost_30_days
+      SUM(cost) AS cost_30_days,
+      SUM(conversions) AS conversions_30_days,
+      SUM(ConversionValue) AS conversions_value_30_days,
     FROM
       `{project_id}.{dataset}.ShoppingProductStats_{external_customer_id}` AS ShoppingProductStats
     INNER JOIN

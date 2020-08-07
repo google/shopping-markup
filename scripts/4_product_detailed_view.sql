@@ -54,6 +54,11 @@ WITH
     MAX(product_type_l3) AS product_type_l3,
     MAX(product_type_l4) AS product_type_l4,
     MAX(product_type_l5) AS product_type_l5,
+    MAX(google_product_category_l1) AS google_product_category_l1,
+    MAX(google_product_category_l2) AS google_product_category_l2,
+    MAX(google_product_category_l3) AS google_product_category_l3,
+    MAX(google_product_category_l4) AS google_product_category_l4,
+    MAX(google_product_category_l5) AS google_product_category_l5,
     MAX(custom_labels.label_0) AS custom_label_0,
     MAX(custom_labels.label_1) AS custom_label_1,
     MAX(custom_labels.label_2) AS custom_label_2,
@@ -63,6 +68,8 @@ WITH
     MAX(product_metrics_view.impressions_30_days) AS impressions_30_days,
     MAX(product_metrics_view.clicks_30_days) AS clicks_30_days,
     MAX(product_metrics_view.cost_30_days) AS cost_30_days,
+    MAX(product_metrics_view.conversions_30_days) AS conversions_30_days,
+    MAX(product_metrics_view.conversions_value_30_days) AS conversions_value_30_days,
     ANY_VALUE(issues) AS issues
   FROM
     `{project_id}.{dataset}.product_view` product_view,
