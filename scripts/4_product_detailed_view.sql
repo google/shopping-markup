@@ -73,7 +73,7 @@ WITH
     MAX(description) AS description,
     MAX(mobile_link) AS mobile_link,
     MAX(image_link) AS image_link,
-    MAX(additional_image_links) AS additional_image_links,
+    ANY_VALUE(additional_image_links) AS additional_image_links,
     MAX(content_language) AS content_language,
     MAX(target_country) AS target_country,
     MAX(expiration_date) AS expiration_date,
@@ -90,9 +90,9 @@ WITH
     MAX(material) AS material,
     MAX(mpn) AS mpn,
     MAX(pattern) AS pattern,
-    MAX(price) AS price,
-    MAX(sale_price) AS sale_price,
-    MAX(additional_product_types) AS additional_product_types,
+    ANY_VALUE(price) AS price,
+    ANY_VALUE(sale_price) AS sale_price,
+    ANY_VALUE(additional_product_types) AS additional_product_types,
     ANY_VALUE(issues) AS issues
   FROM
     `{project_id}.{dataset}.product_view` product_view,
