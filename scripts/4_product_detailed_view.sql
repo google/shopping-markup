@@ -38,15 +38,7 @@ WITH
       1
     END
       ) AS is_approved,
-    MIN(CASE
-        WHEN
-          servability IS NOT NULL
-          AND LOWER(servability) <> 'unaffected'
-          AND LOWER(servability) <> 'demoted'
-          THEN 0
-        ELSE
-          1
-      END) AS is_targeted,
+    MIN(IF(TargetedProduct.product_id IS NULL, 0, 1)) AS is_targeted,
     MAX(title) AS title,
     MAX(link) AS item_url,
     MAX(product_type_l1) AS product_type_l1,
@@ -111,6 +103,11 @@ WITH
     `{project_id}.{dataset}.customer_view` customer_view
   ON
     customer_view.externalcustomerid = product_metrics_view.externalcustomerid
+  LEFT JOIN
+    `{project_id}.{dataset}.TargetedProduct` TargetedProduct
+  ON
+    TargetedProduct.merchant_id = product_view.merchant_id
+    AND TargetedProduct.product_id = product_view.product_id
   GROUP BY
     account_id,
     product_view.merchant_id,

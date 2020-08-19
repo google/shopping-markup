@@ -20,11 +20,30 @@
 
 CREATE OR REPLACE VIEW `{project_id}.{dataset}.product_view`
 AS (
+  WITH MultiChannelTable AS (
+    SELECT DISTINCT
+      merchant_id,
+      offer_id
+    FROM
+      `{project_id}.{dataset}.Products_{merchant_id}`
+    WHERE
+      _PARTITIONDATE IN (
+        (
+          SELECT
+            MAX(_PARTITIONDATE)
+          FROM
+            `{project_id}.{dataset}.Products_{merchant_id}`
+        ))
+    GROUP BY
+      merchant_id,
+      offer_id
+    HAVING COUNT(DISTINCT(channel)) > 1
+  )
   SELECT
     product_id,
-    merchant_id,
+    Products.merchant_id,
     aggregator_id,
-    offer_id,
+    Products.offer_id,
     title,
     description,
     link,
@@ -58,7 +77,7 @@ AS (
     additional_product_types,
     destinations,
     issues,
-    CONCAT(CAST(merchant_id AS STRING), '|', product_id) AS unique_product_id,
+    CONCAT(CAST(Products.merchant_id AS STRING), '|', product_id) AS unique_product_id,
     IFNULL(SPLIT(product_type, '>')[SAFE_OFFSET(0)], 'N/A') AS product_type_l1,
     IFNULL(SPLIT(product_type, '>')[SAFE_OFFSET(1)], 'N/A') AS product_type_l2,
     IFNULL(SPLIT(product_type, '>')[SAFE_OFFSET(2)], 'N/A') AS product_type_l3,
@@ -69,9 +88,13 @@ AS (
     IFNULL(SPLIT(google_product_category_path, '>')[SAFE_OFFSET(2)], 'N/A') AS google_product_category_l3,
     IFNULL(SPLIT(google_product_category_path, '>')[SAFE_OFFSET(3)], 'N/A') AS google_product_category_l4,
     IFNULL(SPLIT(google_product_category_path, '>')[SAFE_OFFSET(4)], 'N/A') AS google_product_category_l5,
-    IF(availability = 'in stock', 1, 0) AS in_stock
+    IF(availability = 'in stock', 1, 0) AS in_stock,
+    IF(MultiChannelTable.offer_id IS NULL, 'single_channel', 'multi_channel') AS channel_exclusivity
   FROM
-    `{project_id}.{dataset}.Products_{merchant_id}`
+    `{project_id}.{dataset}.Products_{merchant_id}` AS Products
+    LEFT JOIN MultiChannelTable
+      ON MultiChannelTable.offer_id = Products.offer_id
+        AND MultiChannelTable.merchant_id = Products.merchant_id
   WHERE
     _PARTITIONDATE IN (
       (

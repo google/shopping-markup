@@ -24,17 +24,21 @@ from typing import Any, Dict
 
 import pytz
 
+import google.protobuf.json_format
 from google.cloud import bigquery_datatransfer_v1
 from google.cloud.bigquery_datatransfer_v1 import types
 from google.protobuf import struct_pb2
 from google.protobuf import timestamp_pb2
 import auth
 import config_parser
+import cloud_bigquery
 
 _MERCHANT_CENTER_ID = 'merchant_center'  # Data source id for Merchant Center.
 _GOOGLE_ADS_ID = 'adwords'  # Data source id for Google Ads.
 _SLEEP_SECONDS = 60  # Seconds to sleep before checking resource status.
 _MAX_POLL_COUNTER = 100
+_PENDING_STATE = 2
+_RUNNING_STATE = 3
 _SUCCESS_STATE = 4
 _FAILED_STATE = 5
 _CANCELLED_STATE = 6
@@ -114,8 +118,8 @@ class CloudDataTransferUtils(object):
         raise DataTransferError(error_message)
 
   def _get_existing_transfer(self, data_source_id: str,
-                             destination_dataset_id: str,
-                             params: Dict[str, str]) -> bool:
+                             destination_dataset_id: str = None,
+                             params: Dict[str, str] = None) -> bool:
     """Gets data transfer if it already exists.
 
     Args:
@@ -131,14 +135,14 @@ class CloudDataTransferUtils(object):
     for transfer_config in self.client.list_transfer_configs(parent):
       if transfer_config.data_source_id != data_source_id:
         continue
-      if transfer_config.destination_dataset_id != destination_dataset_id:
+      if destination_dataset_id and transfer_config.destination_dataset_id != destination_dataset_id:
         continue
       has_param_configs = True
       for key, value in params.items():
         if transfer_config.params[key] != value:
           has_param_configs = False
           break
-      if has_param_configs and transfer_config.state == _SUCCESS_STATE:
+      if has_param_configs and transfer_config.state in (_PENDING_STATE, _RUNNING_STATE, _SUCCESS_STATE):
         return transfer_config
     return None
 
@@ -256,6 +260,35 @@ class CloudDataTransferUtils(object):
       start_time_pb.FromDatetime(start_time)
       end_time_pb.FromDatetime(end_time)
       self.client.schedule_transfer_runs(parent, start_time_pb, end_time_pb)
+    return transfer_config
+
+  def schedule_query(self, name: str, query_string: str) -> types.TransferConfig:
+    parameters = struct_pb2.Struct()
+    parameters['query'] = query_string
+    data_transfer_config = self._get_existing_transfer('scheduled_query',
+                                                       params=parameters)
+    if data_transfer_config:
+      logging.info('Data transfer for scheduling query "%s" already exists.', name)
+      return data_transfer_config
+    dataset_location = config_parser.get_dataset_location()
+    parent = self.client.location_path(self.project_id, dataset_location)
+    transfer_config_input = google.protobuf.json_format.ParseDict(
+      {
+          "display_name": name,
+          "data_source_id": "scheduled_query",
+          "params": {
+              "query": query_string
+          },
+          "schedule": "every 24 hours",
+      },
+      bigquery_datatransfer_v1.types.TransferConfig(),
+    )
+    has_valid_credentials = self._check_valid_credentials('scheduled_query')
+    authorization_code = ''
+    if not has_valid_credentials:
+      authorization_code = self._get_authorization_code('scheduled_query')
+    transfer_config = self.client.create_transfer_config(
+        parent, transfer_config_input, authorization_code)
     return transfer_config
 
   def _get_data_source(self, data_source_id: str) -> types.DataSource:
