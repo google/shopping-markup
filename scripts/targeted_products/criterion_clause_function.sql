@@ -24,7 +24,7 @@ LANGUAGE js AS """
     if(subCriterion.startsWith('custom')) {{
       const customLabelRegex = /custom(\\d+)/;
       result = subCriterion.split('==');
-      
+
       index = result[0].match(customLabelRegex)[1];
       value = result[1]
       if(value != '*') {{
@@ -42,7 +42,7 @@ LANGUAGE js AS """
     if(subCriterion.startsWith('product_type_')) {{
       const productTypeRegex = /product_type_l(\\d+)/;
       result = subCriterion.split('==');
-      
+
       index = result[0].match(productTypeRegex)[1];
       value = result[1]
       if(value != '*') {{
@@ -51,9 +51,9 @@ LANGUAGE js AS """
       }}
     }}
     if(subCriterion.startsWith('category_')) {{
-      const categoryRegex = /google_product_category_l(\\d+)/;
+      const categoryRegex = /category_l(\\d+)/;
       result = subCriterion.split('==');
-      
+
       index = result[0].match(categoryRegex)[1];
       value = result[1]
       if(value != '*') {{
