@@ -117,9 +117,8 @@ def main():
   }
   query = cloud_bigquery.get_update_targeted_products_sql(args.project_id, args.dataset_id,
                                                           args.merchant_id, ads_customer_id)
-  schedule_query_config = data_transfer.schedule_query('Update targeted products', query)
-  data_transfer.wait_for_transfer_completion(schedule_query_config)
-  logging.info('Updated targeted products')
+  data_transfer.schedule_query('Update targeted products', query)
+  logging.info('Job created to update targeted products')
 
 
 if __name__ == '__main__':

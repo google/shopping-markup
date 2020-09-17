@@ -14,17 +14,18 @@
 
 -- Updates targeted products.
 
-DECLARE Criterions ARRAY<STRING>;
-DECLARE criterion STRING;
+DECLARE criterions ARRAY<STRING>;
+DECLARE to_be_processed ARRAY<STRING> DEFAULT [];
 DECLARE where_clause STRING;
 DECLARE i INT64 DEFAULT 0;
+DECLARE BATCH_SIZE INT64 DEFAULT 50;
 
-SET Criterions = (
+SET criterions = (
   WITH DistinctCriterion AS (
     SELECT DISTINCT
       Criteria
     FROM
-      `{project_id}.{dataset}.Criteria_{external_customer_id}` AS CriteriaTable
+      `{project_id}.{dataset}.Criteria_6583794055` AS CriteriaTable
     WHERE
       CriteriaType = 'PRODUCT_PARTITION'
       AND CriteriaTable._DATA_DATE = CriteriaTable._LATEST_DATE
@@ -42,13 +43,20 @@ CREATE OR REPLACE TABLE `{project_id}.{dataset}.StagingTargetedProduct`
  );
 
 LOOP
-  IF i >= ARRAY_LENGTH(Criterions) THEN
+  IF i >= ARRAY_LENGTH(criterions) THEN
     BREAK;
   END IF;
-  SET criterion = Criterions[SAFE_OFFSET(i)];
-  SET where_clause = `{project_id}.{dataset}.getWhereClause`(criterion);
-  EXECUTE IMMEDIATE `{project_id}.{dataset}.getTargetedProductsSql`(where_clause, criterion);
-  SET i = i + 1;
+  SET to_be_processed = (
+    SELECT ARRAY_AGG(part ORDER BY index)
+    FROM UNNEST(criterions) part WITH OFFSET index
+    WHERE index BETWEEN i AND i+BATCH_SIZE
+  );
+  SET i = i + BATCH_SIZE + 1;
+  SET where_clause = `{project_id}.{dataset}.getWhereClause`(to_be_processed);
+  IF where_clause = '' THEN
+    BREAK;
+  END IF;
+  EXECUTE IMMEDIATE `{project_id}.{dataset}.getTargetedProductsSql`(where_clause);
 END LOOP;
 
 CREATE OR REPLACE TABLE `{project_id}.{dataset}.TargetedProduct`

@@ -15,13 +15,36 @@
 -- Returns SQL to identify targeted products.
 
 CREATE OR REPLACE FUNCTION `{project_id}.{dataset}.getTargetedProductsSql`(
-  whereClause STRING,
-  criterion STRING)
+  whereClause STRING)
 RETURNS STRING
 LANGUAGE js AS """
     const sql = `
       CREATE OR REPLACE TABLE \\`{project_id}.{dataset}.StagingTargetedProduct\\`
       AS (
+        WITH TargetedMerchantInfo AS (
+          SELECT DISTINCT
+            MerchantId AS merchant_id,
+            AdGroupId AS ad_group_id,
+            UPPER(GeoTargets.Country_Code) AS target_country
+          FROM
+            \\`{project_id}.{dataset}.ShoppingProductStats_{external_customer_id}\\` AS ShoppingProductStats
+          INNER JOIN \\`{project_id}.{dataset}.geo_targets\\` GeoTargets
+            ON GeoTargets.parent_id = ShoppingProductStats.CountryCriteriaId
+          WHERE
+            ShoppingProductStats._DATA_DATE = ShoppingProductStats._LATEST_DATE
+        ), CriteriaInfo AS (
+          SELECT
+            TargetedMerchantInfo.merchant_id,
+            TargetedMerchantInfo.target_country,
+            CriteriaTable.criteria
+          FROM
+            TargetedMerchantInfo
+          INNER JOIN
+            \\`{project_id}.{dataset}.Criteria_{external_customer_id}\\` AS CriteriaTable
+            ON
+              CriteriaTable.AdGroupId = TargetedMerchantInfo.ad_group_id
+              AND CriteriaTable._DATA_DATE = CriteriaTable._LATEST_DATE
+        )
         SELECT DISTINCT
           product_id,
           merchant_id
@@ -29,41 +52,17 @@ LANGUAGE js AS """
           \\`{project_id}.{dataset}.StagingTargetedProduct\\`
         UNION DISTINCT
         SELECT DISTINCT
-          product_id,
-          merchant_id
+          ProductView.product_id,
+          ProductView.merchant_id
         FROM
-          \\`{project_id}.{dataset}.product_view\\`
+          \\`{project_id}.{dataset}.product_view\\` AS ProductView
+        INNER JOIN CriteriaInfo
+          ON
+            CriteriaInfo.merchant_id = ProductView.merchant_id
+            AND CriteriaInfo.target_country = ProductView.target_country
         WHERE
-          merchant_id IN (
-            (
-              SELECT DISTINCT
-                MerchantId
-              FROM
-                \\`{project_id}.{dataset}.Criteria_{external_customer_id}\\` AS CriteriaTable
-              INNER JOIN \\`{project_id}.{dataset}.ShoppingProductStats_{external_customer_id}\\` AS ShoppingProductStats
-                ON  CriteriaTable.AdGroupId = ShoppingProductStats.AdGroupId
-              WHERE
-                CriteriaTable._DATA_DATE = CriteriaTable._LATEST_DATE
-                AND ShoppingProductStats._DATA_DATE = ShoppingProductStats._LATEST_DATE
-                AND CriteriaTable.Criteria = "{{criterion}}"
-            ))
-          AND target_country IN (
-            (
-              SELECT DISTINCT
-                UPPER(GeoTargets.Country_Code)
-              FROM
-                \\`{project_id}.{dataset}.Criteria_{external_customer_id}\\` AS CriteriaTable
-              INNER JOIN \\`{project_id}.{dataset}.ShoppingProductStats_{external_customer_id}\\` AS ShoppingProductStats
-                ON  CriteriaTable.AdGroupId = ShoppingProductStats.AdGroupId
-              INNER JOIN \\`{project_id}.{dataset}.geo_targets\\` GeoTargets
-                ON GeoTargets.parent_id = ShoppingProductStats.CountryCriteriaId
-              WHERE
-                CriteriaTable._DATA_DATE = CriteriaTable._LATEST_DATE
-                AND ShoppingProductStats._DATA_DATE = ShoppingProductStats._LATEST_DATE
-                AND CriteriaTable.Criteria = "{{criterion}}"
-            ))
-          AND {{whereClause}}
+          {{whereClause}}
       );
     `;
-    return sql.replace(/{{criterion}}/g, criterion).replace(/{{whereClause}}/g, whereClause);
+    return sql.replace(/{{whereClause}}/g, whereClause);
   """;
