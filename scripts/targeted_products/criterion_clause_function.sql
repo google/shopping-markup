@@ -17,7 +17,7 @@
 CREATE OR REPLACE FUNCTION `{project_id}.{dataset}.getWhereClause`(criterions ARRAY<STRING>)
 RETURNS STRING
 LANGUAGE js AS """
-  function getWhereClause(criterion) {
+  function getWhereClause(criterion) {{
     const targetConditions = []
     subCriterions = criterion.split('&+');
     for (subCriterion of subCriterions) {{
@@ -97,15 +97,15 @@ LANGUAGE js AS """
     }}
     targetConditions.push('Criteria = "' + criterion + '"');
     return targetConditions.join(' AND ');
-  }
+  }}
   whereClause = ''
-  for (criterion of criterions) {
+  for (criterion of criterions) {{
     clause = getWhereClause(criterion)
-    if (whereClause == '') {
+    if (whereClause == '') {{
       whereClause = '(' + clause + ')';
       continue;
-    }
+    }}
     whereClause += ' OR ' + '(' + clause + ')';
-  }
+  }}
   return whereClause;
   """;
