@@ -151,3 +151,5 @@ Create `Product Detailed` Data Source
 *   Choose the new "`Product Detailed`" data-source created in the previous step
 
 *   Click "`Copy Report`"
+
+#### Note - The performance metrics in the dashboard might take 12-24 hours to appear.

@@ -25,7 +25,7 @@ SET criterions = (
     SELECT DISTINCT
       Criteria
     FROM
-      `{project_id}.{dataset}.Criteria_6583794055` AS CriteriaTable
+      `{project_id}.{dataset}.Criteria_{external_customer_id}` AS CriteriaTable
     WHERE
       CriteriaType = 'PRODUCT_PARTITION'
       AND CriteriaTable._DATA_DATE = CriteriaTable._LATEST_DATE
