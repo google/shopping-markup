@@ -18,7 +18,7 @@ DECLARE criterions ARRAY<STRING>;
 DECLARE to_be_processed ARRAY<STRING> DEFAULT [];
 DECLARE where_clause STRING;
 DECLARE i INT64 DEFAULT 0;
-DECLARE BATCH_SIZE INT64 DEFAULT 50;
+DECLARE BATCH_SIZE INT64 DEFAULT 500;
 
 SET criterions = (
   WITH DistinctCriterion AS (
@@ -36,12 +36,6 @@ SET criterions = (
     DistinctCriterion
 );
 
-CREATE OR REPLACE TABLE `{project_id}.{dataset}.StagingTargetedProduct`
- (
-   product_id STRING,
-   merchant_id INT64
- );
-
 LOOP
   IF i >= ARRAY_LENGTH(criterions) THEN
     BREAK;
@@ -52,18 +46,105 @@ LOOP
     WHERE index BETWEEN i AND i+BATCH_SIZE
   );
   SET i = i + BATCH_SIZE + 1;
-  SET where_clause = `{project_id}.{dataset}.getWhereClause`(to_be_processed);
-  IF where_clause = '' THEN
-    BREAK;
-  END IF;
-  EXECUTE IMMEDIATE `{project_id}.{dataset}.getTargetedProductsSql`(where_clause);
+  EXECUTE IMMEDIATE `{project_id}.{dataset}.constructParsedCriteria_{external_customer_id}`(to_be_processed);
 END LOOP;
 
-CREATE OR REPLACE TABLE `{project_id}.{dataset}.TargetedProduct`
+CREATE OR REPLACE TABLE `{project_id}.{dataset}.TargetedProduct_{external_customer_id}`
 AS (
+  WITH TargetedMerchantInfo AS (
+    SELECT DISTINCT
+      MerchantId AS merchant_id,
+      AdGroupId AS ad_group_id,
+      UPPER(GeoTargets.Country_Code) AS target_country
+    FROM
+      `{project_id}.{dataset}.ShoppingProductStats_{external_customer_id}` AS ShoppingProductStats
+    INNER JOIN `{project_id}.{dataset}.geo_targets` GeoTargets
+      ON GeoTargets.parent_id = ShoppingProductStats.CountryCriteriaId
+    WHERE
+      ShoppingProductStats._DATA_DATE = ShoppingProductStats._LATEST_DATE
+  ), CriteriaInfo AS (
+    SELECT
+      TargetedMerchantInfo.merchant_id,
+      TargetedMerchantInfo.target_country,
+      CriteriaTable.criteria
+    FROM
+      TargetedMerchantInfo
+    INNER JOIN
+      `{project_id}.{dataset}.Criteria_{external_customer_id}` AS CriteriaTable
+      ON
+        CriteriaTable.AdGroupId = TargetedMerchantInfo.ad_group_id
+        AND CriteriaTable._DATA_DATE = CriteriaTable._LATEST_DATE
+  )
   SELECT DISTINCT
-    product_id,
-    merchant_id
+    ProductView.product_id,
+    ProductView.merchant_id
   FROM
-    `{project_id}.{dataset}.StagingTargetedProduct`
+    `{project_id}.{dataset}.product_view_{merchant_id}` AS ProductView
+  INNER JOIN CriteriaInfo
+    ON
+      CriteriaInfo.merchant_id = ProductView.merchant_id
+      AND CriteriaInfo.target_country = ProductView.target_country
+  INNER JOIN `{project_id}.{dataset}.ParsedCriteria_{external_customer_id}` AS ParsedCriteria
+    ON
+      ParsedCriteria.criteria = CriteriaInfo.criteria
+      AND (
+        ParsedCriteria.custom_label0 IS NULL
+        OR TRIM(LOWER(ParsedCriteria.custom_label0)) = TRIM(LOWER(ProductView.custom_labels.label_0)))
+      AND (
+        ParsedCriteria.custom_label1 IS NULL
+        OR TRIM(LOWER(ParsedCriteria.custom_label1)) = TRIM(LOWER(ProductView.custom_labels.label_1)))
+      AND (
+        ParsedCriteria.custom_label2 IS NULL
+        OR TRIM(LOWER(ParsedCriteria.custom_label2)) = TRIM(LOWER(ProductView.custom_labels.label_2)))
+      AND (
+        ParsedCriteria.custom_label3 IS NULL
+        OR TRIM(LOWER(ParsedCriteria.custom_label3)) = TRIM(LOWER(ProductView.custom_labels.label_3)))
+      AND (
+        ParsedCriteria.custom_label4 IS NULL
+        OR TRIM(LOWER(ParsedCriteria.custom_label4)) = TRIM(LOWER(ProductView.custom_labels.label_4)))
+      AND (
+        ParsedCriteria.product_type_l1 IS NULL
+        OR TRIM(LOWER(ParsedCriteria.product_type_l1)) = TRIM(LOWER(ProductView.product_type_l1)))
+      AND (
+        ParsedCriteria.product_type_l2 IS NULL
+        OR TRIM(LOWER(ParsedCriteria.product_type_l2)) = TRIM(LOWER(ProductView.product_type_l2)))
+      AND (
+        ParsedCriteria.product_type_l3 IS NULL
+        OR TRIM(LOWER(ParsedCriteria.product_type_l3)) = TRIM(LOWER(ProductView.product_type_l3)))
+      AND (
+        ParsedCriteria.product_type_l4 IS NULL
+        OR TRIM(LOWER(ParsedCriteria.product_type_l4)) = TRIM(LOWER(ProductView.product_type_l4)))
+      AND (
+        ParsedCriteria.product_type_l5 IS NULL
+        OR TRIM(LOWER(ParsedCriteria.product_type_l5)) = TRIM(LOWER(ProductView.product_type_l5)))
+      AND (
+        ParsedCriteria.google_product_category_l1 IS NULL
+        OR TRIM(LOWER(ParsedCriteria.google_product_category_l1)) = TRIM(LOWER(ProductView.google_product_category_l1)))
+      AND (
+        ParsedCriteria.google_product_category_l2 IS NULL
+        OR TRIM(LOWER(ParsedCriteria.google_product_category_l2)) = TRIM(LOWER(ProductView.google_product_category_l2)))
+      AND (
+        ParsedCriteria.google_product_category_l3 IS NULL
+        OR TRIM(LOWER(ParsedCriteria.google_product_category_l3)) = TRIM(LOWER(ProductView.google_product_category_l3)))
+      AND (
+        ParsedCriteria.google_product_category_l4 IS NULL
+        OR TRIM(LOWER(ParsedCriteria.google_product_category_l4)) = TRIM(LOWER(ProductView.google_product_category_l4)))
+      AND (
+        ParsedCriteria.google_product_category_l5 IS NULL
+        OR TRIM(LOWER(ParsedCriteria.google_product_category_l5)) = TRIM(LOWER(ProductView.google_product_category_l5)))
+      AND (
+        ParsedCriteria.brand IS NULL
+        OR TRIM(LOWER(ParsedCriteria.brand)) = TRIM(LOWER(ProductView.brand)))
+      AND (
+        ParsedCriteria.offer_id IS NULL
+        OR TRIM(LOWER(ParsedCriteria.offer_id)) = TRIM(LOWER(ProductView.offer_id)))
+      AND (
+        ParsedCriteria.channel IS NULL
+        OR TRIM(LOWER(ParsedCriteria.channel)) = TRIM(LOWER(ProductView.channel)))
+      AND (
+        ParsedCriteria.channel_exclusivity IS NULL
+        OR TRIM(LOWER(ParsedCriteria.channel_exclusivity)) = TRIM(LOWER(ProductView.channel_exclusivity)))
+      AND (
+        ParsedCriteria.condition IS NULL
+        OR TRIM(LOWER(ParsedCriteria.condition)) = TRIM(LOWER(ProductView.condition)))
 );

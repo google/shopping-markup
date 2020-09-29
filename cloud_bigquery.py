@@ -140,8 +140,7 @@ def execute_queries(project_id: str, dataset_id: str, merchant_id: str,
   sql_files = [
       '1_product_view.sql',
       'targeted_products/targeted_product_ddl.sql',
-      'targeted_products/criterion_clause_function.sql',
-      'targeted_products/get_targeted_products_sql_function.sql',
+      'targeted_products/construct_parsed_criteria.sql',
       '2_product_metrics_view.sql',
       '3_customer_view.sql',
       '4_product_detailed_view.sql'

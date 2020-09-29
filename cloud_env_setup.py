@@ -117,7 +117,8 @@ def main():
   }
   query = cloud_bigquery.get_update_targeted_products_sql(args.project_id, args.dataset_id,
                                                           args.merchant_id, ads_customer_id)
-  data_transfer.schedule_query('Update targeted products', query)
+  data_transfer.schedule_query(f'Update targeted products - {ads_customer_id}',
+                               query)
   logging.info('Job created to update targeted products')
 
 

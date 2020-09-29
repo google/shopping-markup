@@ -18,7 +18,7 @@
 -- This view will get latest product data and create derived columns useful
 -- for further processing of data.
 
-CREATE OR REPLACE VIEW `{project_id}.{dataset}.product_view`
+CREATE OR REPLACE VIEW `{project_id}.{dataset}.product_view_{merchant_id}`
 AS (
   WITH MultiChannelTable AS (
     SELECT DISTINCT

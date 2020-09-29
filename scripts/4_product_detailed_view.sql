@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+-- Creates a latest snapshot view of products combined with performance metrics.
 CREATE OR REPLACE VIEW
   `{project_id}.{dataset}.product_detailed` AS
 WITH
@@ -21,7 +22,7 @@ WITH
       unique_product_id,
       servability
     FROM
-      `{project_id}.{dataset}.product_view`,
+      `{project_id}.{dataset}.product_view_{merchant_id}`,
       UNNEST(issues) issues ),
   ProductData AS (
   SELECT
@@ -87,7 +88,7 @@ WITH
     ANY_VALUE(additional_product_types) AS additional_product_types,
     ANY_VALUE(issues) AS issues
   FROM
-    `{project_id}.{dataset}.product_view` product_view,
+    `{project_id}.{dataset}.product_view_{merchant_id}` product_view,
     UNNEST(destinations) AS destinations
   LEFT JOIN
     ProductIssuesTable
@@ -104,7 +105,7 @@ WITH
   ON
     customer_view.externalcustomerid = product_metrics_view.externalcustomerid
   LEFT JOIN
-    `{project_id}.{dataset}.TargetedProduct` TargetedProduct
+    `{project_id}.{dataset}.TargetedProduct_{external_customer_id}` TargetedProduct
   ON
     TargetedProduct.merchant_id = product_view.merchant_id
     AND TargetedProduct.product_id = product_view.product_id
