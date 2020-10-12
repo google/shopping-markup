@@ -41,9 +41,9 @@ AS (
   )
   SELECT
     product_id,
-    Products.merchant_id,
+    merchant_id,
     aggregator_id,
-    Products.offer_id,
+    offer_id,
     title,
     description,
     link,
@@ -92,9 +92,7 @@ AS (
     IF(MultiChannelTable.offer_id IS NULL, 'single_channel', 'multi_channel') AS channel_exclusivity
   FROM
     `{project_id}.{dataset}.Products_{merchant_id}` AS Products
-    LEFT JOIN MultiChannelTable
-      ON MultiChannelTable.offer_id = Products.offer_id
-        AND MultiChannelTable.merchant_id = Products.merchant_id
+    LEFT JOIN MultiChannelTable USING (offer_id, merchant_id)
   WHERE
     _PARTITIONDATE IN (
       (

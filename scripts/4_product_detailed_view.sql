@@ -20,10 +20,22 @@ WITH
     SELECT
       merchant_id,
       unique_product_id,
-      servability
-    FROM
-      `{project_id}.{dataset}.product_view_{merchant_id}`,
-      UNNEST(issues) issues ),
+      MAX(IF(LOWER(servability) = 'disapproved', FALSE, TRUE)) AS has_disapproval_issues,
+      MAX(IF(LOWER(servability) = 'demoted', TRUE, FALSE)) AS is_demoted,
+      STRING_AGG(IF(LOWER(servability) = 'disapproved', short_description, NULL), ", ") AS disapproval_issues,
+      STRING_AGG(IF(LOWER(servability) = 'demoted', short_description, NULL), ", ") demotion_issues,
+      STRING_AGG(IF(LOWER(servability) = 'unaffected', short_description, NULL), ", ") warning_issues
+    FROM (
+      SELECT
+        merchant_id,
+        product_id,
+        servability,
+        short_description,
+      FROM
+      `{project_id}.{dataset}.product_view_{merchant_id}` product_view
+      JOIN product_view.issues
+    )
+    GROUP BY 1,2),
   ProductData AS (
   SELECT
     COALESCE(product_view.aggregator_id, product_view.merchant_id) AS account_id,
@@ -33,12 +45,19 @@ WITH
     MAX(product_view.offer_id) AS offer_id,
     MAX(product_view.channel) AS channel,
     MAX(product_view.in_stock) AS in_stock,
-    MIN(CASE
+    # An offer is labeled as approved when able to serve on all destinations
+    MAX(CASE
         WHEN LOWER(destinations.status) <> 'approved' THEN 0
       ELSE
       1
     END
       ) AS is_approved,
+    # Aggregated Issues & Servability Statuses
+    MAX(CAST(IFNULL(has_disapproval_issues, FALSE) as INT64)) AS has_disapproval_issues,
+    MAX(CAST(IFNULL(has_demotion_issues, FALSE) as INT64)) AS has_demotion_issues,
+    MAX(disapproval_issues) as agg_disapproval_issues,
+    MAX(demotion_issues) as agg_demotion_issues,
+    MAX(warning_issues) as agg_warning_issues,
     MIN(IF(TargetedProduct.product_id IS NULL, 0, 1)) AS is_targeted,
     MAX(title) AS title,
     MAX(link) AS item_url,
