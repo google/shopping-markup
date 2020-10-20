@@ -40,6 +40,7 @@ AS (
     HAVING COUNT(DISTINCT(channel)) > 1
   )
   SELECT
+    _PARTITIONDATE as data_date,
     product_id,
     merchant_id,
     aggregator_id,
