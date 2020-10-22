@@ -137,17 +137,67 @@ class CloudDataTransferUtils(object):
         continue
       if destination_dataset_id and transfer_config.destination_dataset_id != destination_dataset_id:
         continue
-      has_param_configs = True
-      for key, value in params.items():
-        if transfer_config.params[key] != value:
-          has_param_configs = False
-          break
-      if has_param_configs and transfer_config.state in (_PENDING_STATE, _RUNNING_STATE, _SUCCESS_STATE):
+      # If the transfer config is in Failed state, we should ignore.
+      is_valid_state = transfer_config.state in (_PENDING_STATE, _RUNNING_STATE,
+                                                 _SUCCESS_STATE)
+      params_match = self._check_params_match(transfer_config, params)
+      if params_match and is_valid_state:
         return transfer_config
     return None
 
+  def _check_params_match(self, transfer_config: types.TransferConfig,
+                             params: Dict[str, str]) -> bool:
+    """Checks if given parameters are present in transfer config.
+
+    Args:
+      transfer_config: Data transfer configuration.
+      params: Data transfer specific parameters.
+
+    Returns:
+      True if given parameters are present in transfer config, False otherwise.
+    """
+    for key, value in params.items():
+      config_params = transfer_config.params
+      if key not in config_params or config_params[key] != value:
+        return False
+    return True
+
+  def _update_existing_transfer(self, transfer_config: types.TransferConfig,
+                                params: Dict[str, str]) -> types.TransferConfig:
+    """Updates existing data transfer.
+
+    If the parameters are already present in the config, then the transfer
+    config update is skipped.
+
+    Args:
+      transfer_config: Data transfer configuration to update.
+      params: Data transfer specific parameters.
+
+    Returns:
+      Updated data transfer config.
+    """
+    if self._check_params_match(transfer_config, params):
+      logging.info('The data transfer config "%s" parameters match. Hence '
+                   'skipping update.', transfer_config.display_name)
+      return transfer_config
+    new_transfer_config = types.TransferConfig()
+    new_transfer_config.CopyFrom(transfer_config)
+    # Clear existing parameter values.
+    new_transfer_config.params.Clear()
+    for key, value in params.items():
+      new_transfer_config.params[key] = value
+    # Only params field is updated.
+    update_mask = {"paths": ["params"]}
+    new_transfer_config = self.client.update_transfer_config(
+        new_transfer_config, update_mask)
+    logging.info('The data transfer config "%s" parameters updated.',
+                 new_transfer_config.display_name)
+    return new_transfer_config
+
   def create_merchant_center_transfer(
-      self, merchant_id: str, destination_dataset: str) -> types.TransferConfig:
+      self, merchant_id: str,
+      destination_dataset: str,
+      enable_market_insights: bool) -> types.TransferConfig:
     """Creates a new merchant center transfer.
 
     Merchant center allows retailers to store product info into Google. This
@@ -156,6 +206,7 @@ class CloudDataTransferUtils(object):
     Args:
       merchant_id: Google Merchant Center(GMC) account id.
       destination_dataset: BigQuery dataset id.
+      enable_market_insights: Whether to deploy market insights solution.
 
     Returns:
       Transfer config.
@@ -171,7 +222,11 @@ class CloudDataTransferUtils(object):
       logging.info(
           'Data transfer for merchant id %s to destination dataset %s '
           'already exists.', merchant_id, destination_dataset)
-      return data_transfer_config
+      if not enable_market_insights:
+        return data_transfer_config
+      parameters['export_price_benchmarks'] = True
+      parameters['export_best_sellers'] = True
+      return self._update_existing_transfer(data_transfer_config, parameters)
     logging.info(
         'Creating data transfer for merchant id %s to destination dataset %s',
         merchant_id, destination_dataset)

@@ -55,6 +55,14 @@ def enable_apis(project_id: str) -> None:
   cloud_api_utils.enable_apis(_APIS_TO_BE_ENABLED)
 
 
+def parse_boolean(arg: str):
+  """Returns boolean representation of argument."""
+  arg = str(arg).lower()
+  if 'true'.startswith(arg):
+      return True
+  return False
+
+
 def parse_arguments() -> argparse.Namespace:
   """Initialize command line parser using argparse.
 
@@ -74,6 +82,11 @@ def parse_arguments() -> argparse.Namespace:
       '--ads_customer_id',
       help='Google Ads External Customer Id.',
       required=True)
+  parser.add_argument(
+      '--market_insights',
+      help='Deploy Market Insights solution.',
+      type=parse_boolean,
+      required=True)
   return parser.parse_args()
 
 
@@ -87,7 +100,7 @@ def main():
   logging.info('Creating %s dataset.', args.dataset_id)
   cloud_bigquery.create_dataset_if_not_exists(args.project_id, args.dataset_id)
   merchant_center_config = data_transfer.create_merchant_center_transfer(
-      args.merchant_id, args.dataset_id)
+      args.merchant_id, args.dataset_id, args.market_insights)
   ads_config = data_transfer.create_google_ads_transfer(ads_customer_id,
                                                         args.dataset_id)
   try:
