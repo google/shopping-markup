@@ -134,7 +134,7 @@ def configure_sql(sql_path: str, query_params: Dict[str, Union[str, int,
 
 
 def execute_queries(project_id: str, dataset_id: str, merchant_id: str,
-                    customer_id: str) -> None:
+                    customer_id: str, enable_market_insights: bool) -> None:
   """Executes list of queries."""
   # Sql files to be executed in a specific order. The prefix "scripts" should be omitted.
   sql_files = [
@@ -145,6 +145,13 @@ def execute_queries(project_id: str, dataset_id: str, merchant_id: str,
       '3_customer_view.sql',
       '4_product_detailed_view.sql'
   ]
+  if enable_market_insights:
+    market_insights_sql_files = [
+      'market_insights/snapshot_view.sql',
+      'market_insights/historical_view.sql',
+      'market_insights/best_sellers_view.sql'
+    ]
+    sql_files.extend(market_insights_sql_files)
   prefix = 'scripts'
   query_params = {
       'project_id': project_id,

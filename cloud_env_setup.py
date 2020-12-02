@@ -119,7 +119,7 @@ def main():
   cloud_bigquery.load_geo_targets(args.project_id, args.dataset_id)
   logging.info('Creating MarkUp specific views.')
   cloud_bigquery.execute_queries(args.project_id, args.dataset_id, args.merchant_id,
-                                 ads_customer_id)
+                                 ads_customer_id, args.market_insights)
   logging.info('Created MarkUp specific views.')
   logging.info('Updating targeted products')
   query_params = {

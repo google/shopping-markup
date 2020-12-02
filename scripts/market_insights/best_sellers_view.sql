@@ -13,7 +13,7 @@
 # limitations under the License.
 
 -- Creates a view based on Best Sellers Products tables
-CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_best_sellers` AS
+CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_best_sellers_view` AS
 (
   WITH
     best_sellers AS (

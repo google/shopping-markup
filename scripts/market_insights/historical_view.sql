@@ -13,7 +13,7 @@
 # limitations under the License.
 
 -- Creates a historical view for Performance, Status, Price & Price Benchmarks.
-CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_historical` AS (
+CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_historical_view` AS (
   WITH
     CountryTable AS (
       SELECT DISTINCT
@@ -29,7 +29,7 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_historical` AS (
       FROM
         `{project_id}.{dataset}.language_codes`
     ),
-    HistoricalProductMetrics AS (
+    product_metrics AS (
       SELECT
         _DATA_DATE as data_date,
         CONCAT(
@@ -48,7 +48,7 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_historical` AS (
         SUM(conversions) AS conversions,
         SUM(ConversionValue) AS conversions_value,
       FROM
-        `{project_id}.{dataset}.ShoppingProductStats_{external_customer_id}`AS ShoppingProductStats
+        `{project_id}.{dataset}.ShoppingProductStats_{external_customer_id}` AS ShoppingProductStats
       INNER JOIN
         CountryTable
         ON CountryTable.country_criterion = ShoppingProductStats.countrycriteriaid
@@ -57,7 +57,7 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_historical` AS (
         ON CAST(LanguageTable.language_criterion AS STRING) = ShoppingProductStats.languagecriteriaid
       GROUP BY 1,2
     ),
-    HistoricalProductStatus AS (
+    product_status AS (
       SELECT
         data_date,
         CONCAT(CAST(merchant_id AS STRING), '|', product_id) AS unique_product_id,
@@ -75,50 +75,59 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_historical` AS (
       )
       GROUP BY 1,2
     ),
-    HistoricalPriceBenchmarks AS (
+    price_benchmarks AS (
       SELECT
-        _PARTITIONDATE as data_date,
-        CONCAT(CAST(merchant_id AS STRING), '|', product_id) AS unique_product_id,
-        country_of_sale as target_country,
+        data_date,
+        unique_product_id,
         price_benchmark_value,
         price_benchmark_currency,
-        price_benchmark_timestamp
-      FROM `{project_id}.{dataset}.Products_PriceBenchmarks_{merchant_id}`
-    ),
-    HistoricalPrice AS (
-      SELECT
-        _PARTITIONDATE as data_date,
-        CONCAT(CAST(merchant_id AS STRING), '|', product_id) AS unique_product_id,
-        price.value AS price,
-        price.currency as price_currency,
-        sale_price.value AS sale_price,
-        sale_price.currency AS sale_price_currency,
-      FROM `{project_id}.{dataset}.Products_{merchant_id}` products
-    ),
-    HistoricalData AS (
-      SELECT
-        IFNULL(HistoricalProductMetrics.data_date, HistoricalPrice.data_date) as data_date,
-        IFNULL(HistoricalProductMetrics.unique_product_id, HistoricalPrice.unique_product_id) as unique_product_id,
-        HistoricalProductMetrics,
-        HistoricalPrice,
-        HistoricalPriceBenchmarks,
-        HistoricalProductStatus,
+        price_benchmark_timestamp,
         CASE
-          WHEN HistoricalPriceBenchmarks.price_benchmark_value IS NULL THEN ''
-          WHEN (SAFE_DIVIDE(HistoricalPrice.price, HistoricalPriceBenchmarks.price_benchmark_value) - 1) < -0.01 THEN 'Less than PB' -- ASSUMPTION: Enter % as a decimal here
-          WHEN (SAFE_DIVIDE(HistoricalPrice.price, HistoricalPriceBenchmarks.price_benchmark_value) - 1) > 0.01 THEN 'More than PB' -- ASSUMPTION: Enter % as a decimal here
+          WHEN price_benchmark_value IS NULL THEN ''
+          WHEN (SAFE_DIVIDE(price, price_benchmark_value) - 1) < -0.01 THEN 'Less than PB' -- ASSUMPTION: Enter % as a decimal here
+          WHEN (SAFE_DIVIDE(price, price_benchmark_value) - 1) > 0.01 THEN 'More than PB' -- ASSUMPTION: Enter % as a decimal here
           ELSE 'Equal to PB'
         END AS price_competitiveness_band,
+        SAFE_DIVIDE(price, price_benchmark_value) - 1 AS price_vs_benchmark,
+        SAFE_DIVIDE(price, price_benchmark_value) - 1 AS sale_price_vs_benchmark,
+      FROM (
+        SELECT
+          _PARTITIONDATE as data_date,
+          CONCAT(CAST(merchant_id AS STRING), '|', product_id) AS unique_product_id,
+          target_country,
+          price.value AS price,
+          price.currency as price_currency,
+          sale_price.value AS sale_price,
+          sale_price.currency AS sale_price_currency,
+        FROM `{project_id}.{dataset}.Products_{merchant_id}`
+      )
+      LEFT JOIN (
+        SELECT
+          _PARTITIONDATE as data_date,
+          CONCAT(CAST(merchant_id AS STRING), '|', product_id) AS unique_product_id,
+          country_of_sale as target_country,
+          price_benchmark_value,
+          price_benchmark_currency,
+          price_benchmark_timestamp
+        FROM `{project_id}.{dataset}.Products_PriceBenchmarks_{merchant_id}`
+      )
+      USING (data_date, unique_product_id, target_country)
+    ),
+    historical_data AS (
+      SELECT
+        IFNULL(IFNULL(product_metrics.data_date, price_benchmarks.data_date), product_status.data_date)  as data_date,
+        IFNULL(IFNULL(product_metrics.unique_product_id, price_benchmarks.unique_product_id), product_status.unique_product_id) as unique_product_id,
+        product_metrics,
+        price_benchmarks,
+        product_status,
       FROM
-        HistoricalProductMetrics
-      FULL JOIN HistoricalPrice USING (data_date, unique_product_id)
-      FULL JOIN HistoricalPriceBenchmarks USING (data_date, unique_product_id)
-      FULL JOIN HistoricalProductStatus USING (data_date, unique_product_id)
-      WHERE HistoricalPrice.data_date IS NOT NULL
+        product_metrics
+      FULL JOIN price_benchmarks USING (data_date, unique_product_id)
+      FULL JOIN product_status USING (data_date, unique_product_id)
     )
   SELECT
-    ProductView,
-    HistoricalData.*,
-  FROM `{project_id}.{dataset}.product_view_{merchant_id}` ProductView
-  LEFT JOIN HistoricalData USING (unique_product_id)
-);
+    product,
+    historical_data.*,
+  FROM `{project_id}.{dataset}.product_view_{merchant_id}` product
+  LEFT JOIN historical_data USING (unique_product_id)
+)

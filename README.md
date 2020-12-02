@@ -12,6 +12,7 @@ ads performance.
 *   [1. Overview](#1-overview)
     *   [1.1. Value Proposition](#1-1-value-proposition)
     *   [1.2. Solution Architecture](#solution-architecture)
+    *   [1.3. Solution Options](#solution-options)
 *   [2. Installation](#2-installation)
     *   [2.1. Environment Setup](#environment-setup)
     *   [2.2. Cloud Environment Setup](#cloud-environment-setup)
@@ -43,13 +44,36 @@ Project on a daily basis and provide insights via Data Studio dashboard.
 
 <img src="images/architecture.png">
 
+### 1.3 Solution Options
+
+At this time, there are two onboarding options available:
+
+#### Markup
+
+This is the base solution that exclusively uses the products and product issues
+tables available via the Merchant Center Transfer. This will allow you to set up the
+[Markup Dashboard Template](https://datastudio.google.com/reporting/b6ada6fa-9b6d-4fca-9621-f217a58a6ae2/page/l11LB/preview).
+
+#### Markup + Market Insights
+
+By enabling Market Insights during the installation process, this will
+additionally configure the Market Insights tables available via the Merchant Center Transfer, Price Benchmarks & Best Sellers, as well as three additional BigQuery views:
+
+* `market_insights_snapshot` - a snapshot view that joins the latest product feed data with available price benchmarks, best seller status, and Google Ads performance over the last 30 days.
+* `market_insights_historical` - a date partitioned view that joins the latest product feed data with historical price, price benchmarks, and Google Ads performance over the entire transfer data set.
+* `market_insights_best_sellers` - a view that joins the latest Best Sellers Top Products table with inventory status to show a ranked list of Top Products broken out by category.
+    * Please note: this view is set to only show data for the `en-US` locale. For other locales, you will need to adjust the view's filtering after installation.
+
+With these additional views, you will be able to set up the [Merchant Market Insights Dashboard Template](https://datastudio.google.com/reporting/37411ae9-b5f3-4062-89ea-ea521c885c30/page/QK7kB/preview) in addition to the above Markup Dashboard template.
+
+
 ## 2. Installation
 
 ### 2.1. Google Cloud Platform(GCP) setup
 
 #### 2.1.1 Create a GCP project with billing account
 
-You may skip this step if you already have a GCP account with billing enaled.
+You may skip this step if you already have a GCP account with billing enabled.
 
 *   How to [Create a GCP account](https://cloud.google.com/?authuser=1) (if you
     don't have one already!)
@@ -97,14 +121,15 @@ Please provide following inputs when running the `setup.sh` script:
 *   [Google Ads External Customer Id](https://support.google.com/google-ads/answer/1704344?hl=en)
 
 *   Market Insights - whether to deploy Market Insights solution. Allowed Values - True or False
+  -
 
 ```
 cd shopping-markup;
-sh setup.sh --project_id=<project_id> --merchant_id=<merchant_id> --ads_customer_id=<ads_customer_id> --market_insights=False
+sh setup.sh --project_id=<project_id> --merchant_id=<merchant_id> --ads_customer_id=<ads_customer_id> --market_insights=True
 ```
 
-When installing, the script will check whether does current user have enough
-permissions to continue. It may ask you to open cloud authorization URL in the
+When installing, the script will check whether the current user has the proper
+authorization to continue. It may ask you to open cloud authorization URL in the
 browser. Please follow the instructions as mentioned in the command line.
 
 #### Note - If the script fails when you run it for the first time, it might be due to delay in preparing Merchant account data. Please wait up to 90 minutes before re-running the script.
@@ -126,7 +151,19 @@ During the installation process, the script will do following:
 
 ## 2.3. Configure Data Sources
 
-Create `Product Detailed` Data Source
+You will need to create required Data Source(s) in Data Studio:
+
+For Markup:
+
+* Create `Product Detailed` Data Source (linked to `markup.product_detailed`)
+
+For Merchant Market Insights:
+
+* Create `Market Insights Snapshot` Data Source (linked to `markup.market_insights_snapshot_view`)
+* Create `Market Insights Historical` Data Source (linked to `markup.market_insights_historical_view`)
+* Create `Market Insights Best Sellers` Data Source (linked to `markup.market_insights_best_sellers_view`)
+
+To create a data source:
 
 *   Click on the
     [link](https://datastudio.google.com/c/u/0/datasources/create?connectorId=2)
@@ -136,21 +173,34 @@ Create `Product Detailed` Data Source
 
 *   Search your GCP Project Id under My Projects.
 
-*   Under Dataset, click on "`markup`"
+*   Under Dataset, click on "`markup`".
 
-*   Under Table, choose "`product_detailed`"
+*   Under Table, choose the required table view.
 
 *   Click `Connect` on the top right corner and wait for the data-source to be
     created
 
-## 2.4. Create Data-Studio Dashboard
+## 2.4. Create Data-Studio Dashboard(s)
 
-*   Click on the
+For Markup:
+
+*   Click on the following link to the Data Studio template:
     [link](https://datastudio.google.com/reporting/b6ada6fa-9b6d-4fca-9621-f217a58a6ae2/page/l11LB/preview)
 
 *   Click "`Use Template`"
 
 *   Choose the new "`Product Detailed`" data-source created in the previous step
+
+*   Click "`Copy Report`"
+
+For Merchant Market Insights:
+
+*   Click on the following link to the Data Studio template:
+    [link](https://datastudio.google.com/reporting/37411ae9-b5f3-4062-89ea-ea521c885c30/page/QK7kB/preview)
+
+*   Click "`Use Template`"
+
+*   Choose the three data-sources created in the previous step
 
 *   Click "`Copy Report`"
 
