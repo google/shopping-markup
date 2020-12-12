@@ -155,13 +155,14 @@ You will need to create required Data Source(s) in Data Studio:
 
 For Markup:
 
-* Create `Product Detailed` Data Source (linked to `markup.product_detailed`)
+* Create `product_detailed_materialized` Data Source (linked to `markup.product_detailed_materialized`)
+* Create `product_historical_materialized` Data Source (linked to `markup.product_historical_materialized`)
 
 For Merchant Market Insights:
 
-* Create `Market Insights Snapshot` Data Source (linked to `markup.market_insights_snapshot_view`)
-* Create `Market Insights Historical` Data Source (linked to `markup.market_insights_historical_view`)
-* Create `Market Insights Best Sellers` Data Source (linked to `markup.market_insights_best_sellers_view`)
+* Create `market_insights_snapshot_view` Data Source (linked to `markup.market_insights_snapshot_view`)
+* Create `market_insights_historical_view` Data Source (linked to `markup.market_insights_historical_view`)
+* Create `market_insights_best_sellers_view` Data Source (linked to `markup.market_insights_best_sellers_view`)
 
 To create a data source:
 
@@ -185,11 +186,11 @@ To create a data source:
 For Markup:
 
 *   Click on the following link to the Data Studio template:
-    [link](https://datastudio.google.com/reporting/b6ada6fa-9b6d-4fca-9621-f217a58a6ae2/page/l11LB/preview)
+    [link](https://datastudio.google.com/u/0/reporting/18d17eeb-3e4e-4bdd-a27e-bb20b0b68670/preview)
 
 *   Click "`Use Template`"
 
-*   Choose the new "`Product Detailed`" data-source created in the previous step
+*   Choose the new "`product_detailed_materialized`" and "`product_historical_materialized`" data-sources created in the previous step
 
 *   Click "`Copy Report`"
 

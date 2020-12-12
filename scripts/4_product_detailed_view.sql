@@ -14,30 +14,38 @@
 
 -- Creates a latest snapshot view of products combined with performance metrics.
 CREATE OR REPLACE VIEW
-  `{project_id}.{dataset}.product_detailed` AS
+  `{project_id}.{dataset}.product_detailed_view` AS
 WITH
   ProductIssuesTable AS (
     SELECT
+      data_date,
       merchant_id,
       unique_product_id,
       servability,
-      STRING_AGG(IF(LOWER(servability) = 'disapproved', short_description, NULL), ", ") AS disapproval_issues,
-      STRING_AGG(IF(LOWER(servability) = 'demoted', short_description, NULL), ", ") demotion_issues,
-      STRING_AGG(IF(LOWER(servability) = 'unaffected', short_description, NULL), ", ") warning_issues
+      STRING_AGG(
+        IF(LOWER(servability) = 'disapproved', short_description, NULL), ", ")
+        AS disapproval_issues,
+      STRING_AGG(
+        IF(LOWER(servability) = 'demoted', short_description, NULL), ", ")
+        AS demotion_issues,
+      STRING_AGG(
+        IF(LOWER(servability) = 'unaffected', short_description, NULL), ", ")
+        AS warning_issues
     FROM (
       SELECT
+        data_date,
         merchant_id,
         unique_product_id,
         servability,
         short_description,
       FROM
-      `{project_id}.{dataset}.product_view_{merchant_id}` product_view
-      JOIN product_view.issues
+        `{project_id}.{dataset}.product_view_{merchant_id}` product_view
+      INNER JOIN product_view.issues
     )
-    GROUP BY 1,2,3),
+    GROUP BY 1, 2, 3, 4),
   ProductData AS (
   SELECT
-    MAX(product_view.data_date) as data_date,
+    product_view.data_date,
     COALESCE(product_view.aggregator_id, product_view.merchant_id) AS account_id,
     MAX(customer_view.accountdescriptivename) AS account_display_name,
     product_view.merchant_id AS sub_account_id,
@@ -109,24 +117,29 @@ WITH
     UNNEST(destinations) AS destinations
   LEFT JOIN
     ProductIssuesTable
-  ON
-    ProductIssuesTable.merchant_id = product_view.merchant_id
-    AND ProductIssuesTable.unique_product_id = product_view.unique_product_id
+    ON
+      ProductIssuesTable.merchant_id = product_view.merchant_id
+      AND ProductIssuesTable.unique_product_id = product_view.unique_product_id
+      AND ProductIssuesTable.data_date = product_view.data_date
   LEFT JOIN
     `{project_id}.{dataset}.product_metrics_view` product_metrics_view
-  ON
-    product_metrics_view.merchantid = product_view.merchant_id
-    AND LOWER(product_metrics_view.product_id) = LOWER(product_view.product_id)
+    ON
+      product_metrics_view.merchantid = product_view.merchant_id
+      AND LOWER(product_metrics_view.product_id) = LOWER(product_view.product_id)
+      AND product_metrics_view.data_date = product_view.data_date
   LEFT JOIN
     `{project_id}.{dataset}.customer_view` customer_view
-  ON
-    customer_view.externalcustomerid = product_metrics_view.externalcustomerid
+    ON
+      customer_view.externalcustomerid = product_metrics_view.externalcustomerid
+      AND customer_view.data_date = product_metrics_view.data_date
   LEFT JOIN
     `{project_id}.{dataset}.TargetedProduct_{external_customer_id}` TargetedProduct
-  ON
-    TargetedProduct.merchant_id = product_view.merchant_id
-    AND TargetedProduct.product_id = product_view.product_id
+    ON
+      TargetedProduct.merchant_id = product_view.merchant_id
+      AND TargetedProduct.product_id = product_view.product_id
+      AND TargetedProduct.data_date = product_view.data_date
   GROUP BY
+    data_date,
     account_id,
     product_view.merchant_id,
     product_view.unique_product_id

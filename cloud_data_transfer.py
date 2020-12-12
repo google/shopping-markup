@@ -240,7 +240,8 @@ class CloudDataTransferUtils(object):
         'display_name': f'Merchant Center Transfer - {merchant_id}',
         'data_source_id': _MERCHANT_CENTER_ID,
         'destination_dataset_id': destination_dataset,
-        'params': parameters
+        'params': parameters,
+        'data_refresh_window_days': 0,
     }
     transfer_config = self.client.create_transfer_config(
         parent, transfer_config_input, authorization_code)
@@ -305,7 +306,7 @@ class CloudDataTransferUtils(object):
       transfer_config_id = transfer_config_name.split('/')[-1]
       start_time = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(
           days=backfill_days)
-      end_time = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(days=1)
+      end_time = datetime.datetime.now(tz=pytz.utc)
       start_time = start_time.replace(hour=0, minute=0, second=0, microsecond=0)
       end_time = end_time.replace(hour=0, minute=0, second=0, microsecond=0)
       parent = self.client.location_transfer_config_path(
@@ -317,7 +318,15 @@ class CloudDataTransferUtils(object):
       self.client.schedule_transfer_runs(parent, start_time_pb, end_time_pb)
     return transfer_config
 
-  def schedule_query(self, name: str, query_string: str) -> types.TransferConfig:
+  def schedule_query(self,
+                     name: str,
+                     query_string: str) -> types.TransferConfig:
+    """Schedules query to run every day.
+
+    Args:
+      name: Name of the scheduled query.
+      query_string: The query to be run.
+    """
     parameters = struct_pb2.Struct()
     parameters['query'] = query_string
     data_transfer_config = self._get_existing_transfer('scheduled_query',
@@ -327,14 +336,15 @@ class CloudDataTransferUtils(object):
       return data_transfer_config
     dataset_location = config_parser.get_dataset_location()
     parent = self.client.location_path(self.project_id, dataset_location)
+    params = {
+      'query': query_string,
+    }
     transfer_config_input = google.protobuf.json_format.ParseDict(
       {
-          "display_name": name,
-          "data_source_id": "scheduled_query",
-          "params": {
-              "query": query_string
-          },
-          "schedule": "every 24 hours",
+        'display_name': name,
+        'data_source_id': 'scheduled_query',
+        'params': params,
+        'schedule': 'every 24 hours',
       },
       bigquery_datatransfer_v1.types.TransferConfig(),
     )

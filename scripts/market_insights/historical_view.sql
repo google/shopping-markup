@@ -130,4 +130,12 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_historical_view` 
     historical_data.*,
   FROM `{project_id}.{dataset}.product_view_{merchant_id}` product
   LEFT JOIN historical_data USING (unique_product_id)
+  WHERE
+    product.data_date IN (
+      (
+        SELECT
+          MAX(data_date)
+        FROM
+          `{project_id}.{dataset}.product_view_{merchant_id}`
+      ))
 )

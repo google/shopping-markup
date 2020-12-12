@@ -30,7 +30,7 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_snapshot_view` AS
         END AS price_competitiveness_band,
         SAFE_DIVIDE(product.price.value, price_benchmark_value) - 1 AS price_vs_benchmark,
         SAFE_DIVIDE(product.price.value, price_benchmark_value) - 1 AS sale_price_vs_benchmark,
-      FROM `{project_id}.{dataset}.product_detailed` product
+      FROM `{project_id}.{dataset}.product_detailed_materialized` product
       JOIN (
         SELECT
           _PARTITIONDATE as data_date,
@@ -72,7 +72,7 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_snapshot_view` AS
     product,
     price_benchmarks,
     best_sellers,
-  FROM `{project_id}.{dataset}.product_detailed` product
+  FROM `{project_id}.{dataset}.product_detailed_materialized` product
   LEFT JOIN price_benchmarks USING (unique_product_id)
   LEFT JOIN best_sellers USING (unique_product_id)
 );

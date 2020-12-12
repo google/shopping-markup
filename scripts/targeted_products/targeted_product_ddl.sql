@@ -15,8 +15,9 @@
 -- DDL definition for TargetedProduct table.
 --
 -- Using `CREATE IF NOT EXISTS` as the table is used in `product_detailed` views.
-CREATE TABLE IF NOT EXISTS `{project_id}.{dataset}.TargetedProduct_{external_customer_id}`
+CREATE OR REPLACE TABLE `{project_id}.{dataset}.TargetedProduct_{external_customer_id}`
 (
+  data_date DATE,
   product_id STRING,
   merchant_id INT64
 );
