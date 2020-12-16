@@ -159,11 +159,12 @@ def execute_queries(project_id: str, dataset_id: str, merchant_id: str,
       'merchant_id': merchant_id,
       'external_customer_id': customer_id
   }
+  location = config_parser.get_dataset_location()
   client = bigquery.Client(project=project_id)
   for sql_file in sql_files:
     try:
       query = configure_sql(os.path.join(prefix, sql_file), query_params)
-      query_job = client.query(query)
+      query_job = client.query(query, location=location)
       query_job.result()
     except:
       logging.exception('Error in %s', sql_file)
