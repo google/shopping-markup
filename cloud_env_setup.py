@@ -43,6 +43,8 @@ _APIS_TO_BE_ENABLED = [
     'bigquery.googleapis.com', 'bigquerydatatransfer.googleapis.com'
 ]
 _DATASET_ID = 'markup'
+_MATERIALIZE_PRODUCT_DETAILED_SQL = 'scripts/materialize_product_detailed.sql'
+_MATERIALIZE_PRODUCT_HISTORICAL_SQL = 'scripts/materialize_product_historical.sql'
 
 
 def enable_apis(project_id: str) -> None:
@@ -128,11 +130,13 @@ def main():
       'merchant_id': args.merchant_id,
       'external_customer_id': ads_customer_id
   }
-  query = cloud_bigquery.get_update_targeted_products_sql(args.project_id, args.dataset_id,
-                                                          args.merchant_id, ads_customer_id)
-  data_transfer.schedule_query(f'Update targeted products - {ads_customer_id}',
+  query = cloud_bigquery.get_main_workflow_sql(
+    args.project_id, args.dataset_id, args.merchant_id, ads_customer_id)
+  data_transfer.schedule_query(f'Main workflow - {ads_customer_id}',
                                query)
-  logging.info('Job created to update targeted products')
+  logging.info('Job created to run markup main workflow.')
+
+  logging.info('MarkUp installation is complete!')
 
 
 if __name__ == '__main__':

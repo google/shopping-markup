@@ -18,14 +18,14 @@
 
 import logging
 import os
-from typing import Dict, Union
+from typing import Any, Dict, Union
 
 from google.cloud import bigquery
 from google.cloud import exceptions
 import config_parser
 
-# Update targeted product sql.
-_UPDATE_TARGETED_PRODUCT_SQL = 'scripts/targeted_products/update_targeted_products_script.sql'
+# Main workflow sql.
+_MAIN_WORKFLOW_SQL = 'scripts/main_workflow.sql'
 
 # Set logging level.
 logging.getLogger().setLevel(logging.INFO)
@@ -108,8 +108,7 @@ def read_file(file_path: str) -> str:
     return content
 
 
-def configure_sql(sql_path: str, query_params: Dict[str, Union[str, int,
-                                                               float]]) -> str:
+def configure_sql(sql_path: str, query_params: Dict[str, Any]) -> str:
   """Configures parameters of SQL script with variables supplied.
 
   Args:
@@ -143,7 +142,9 @@ def execute_queries(project_id: str, dataset_id: str, merchant_id: str,
       'targeted_products/construct_parsed_criteria.sql',
       '2_product_metrics_view.sql',
       '3_customer_view.sql',
-      '4_product_detailed_view.sql'
+      '4_product_detailed_view.sql',
+      'materialize_product_detailed.sql',
+      'materialize_product_historical.sql',
   ]
   if enable_market_insights:
     market_insights_sql_files = [
@@ -171,9 +172,9 @@ def execute_queries(project_id: str, dataset_id: str, merchant_id: str,
       raise
 
 
-def get_update_targeted_products_sql(project_id: str, dataset_id: str, merchant_id: str,
-                                     customer_id: str) -> str:
-  """Returns update targeted products sql.
+def get_main_workflow_sql(project_id: str, dataset_id: str, merchant_id: str,
+                          customer_id: str) -> str:
+  """Returns main workflow sql.
 
   Args:
     project_id: A cloud project id.
@@ -187,4 +188,4 @@ def get_update_targeted_products_sql(project_id: str, dataset_id: str, merchant_
       'merchant_id': merchant_id,
       'external_customer_id': customer_id
   }
-  return configure_sql(_UPDATE_TARGETED_PRODUCT_SQL, query_params)
+  return configure_sql(_MAIN_WORKFLOW_SQL, query_params)
