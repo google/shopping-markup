@@ -156,7 +156,6 @@ You will need to create required Data Source(s) in Data Studio:
 For Markup:
 
 * Create `product_detailed_materialized` Data Source (linked to `markup.product_detailed_materialized`)
-* Create `product_historical_materialized` Data Source (linked to `markup.product_historical_materialized`)
 
 For Merchant Market Insights:
 
@@ -190,7 +189,7 @@ For Markup:
 
 *   Click "`Use Template`"
 
-*   Choose the new "`product_detailed_materialized`" and "`product_historical_materialized`" data-sources created in the previous step
+*   Choose the new "`product_detailed_materialized`" data-source created in the previous step
 
 *   Click "`Copy Report`"
 

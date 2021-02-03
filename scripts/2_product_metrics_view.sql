@@ -67,6 +67,7 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.product_metrics_view`
       externalcustomerid,
       merchantid,
       product_id,
+      MAX(_DATA_DATE) OVER () AS latest_date,
       SUM(impressions)
         OVER (
           PARTITION BY externalcustomerid, merchantid, product_id

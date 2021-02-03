@@ -35,6 +35,7 @@ AS (
   )
   SELECT
     _PARTITIONDATE as data_date,
+    MAX(_PARTITIONDATE) OVER () AS latest_date,
     product_id,
     merchant_id,
     aggregator_id,
