@@ -16,6 +16,7 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.customer_view`
   AS (
     SELECT DISTINCT
       _DATA_DATE AS data_date,
+      MAX(_DATA_DATE) OVER () AS latest_date,
       ExternalCustomerId,
       AccountDescriptiveName
     FROM

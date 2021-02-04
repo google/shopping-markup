@@ -146,6 +146,7 @@ WITH
 )
 SELECT
   *,
+  MAX(data_date) OVER () AS latest_date,
   CASE
     WHEN is_approved = 1 AND in_stock = 1
       THEN 1

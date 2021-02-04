@@ -119,7 +119,8 @@ class CloudDataTransferUtils(object):
 
   def _get_existing_transfer(self, data_source_id: str,
                              destination_dataset_id: str = None,
-                             params: Dict[str, str] = None) -> bool:
+                             params: Dict[str, str] = None,
+                             name: str = None) -> bool:
     """Gets data transfer if it already exists.
 
     Args:
@@ -141,7 +142,8 @@ class CloudDataTransferUtils(object):
       is_valid_state = transfer_config.state in (_PENDING_STATE, _RUNNING_STATE,
                                                  _SUCCESS_STATE)
       params_match = self._check_params_match(transfer_config, params)
-      if params_match and is_valid_state:
+      name_matches = name is None or name == transfer_config.display_name
+      if params_match and is_valid_state and name_matches:
         return transfer_config
     return None
 
@@ -327,13 +329,13 @@ class CloudDataTransferUtils(object):
       name: Name of the scheduled query.
       query_string: The query to be run.
     """
+    data_transfer_config = self._get_existing_transfer('scheduled_query',
+                                                       name=name)
     parameters = struct_pb2.Struct()
     parameters['query'] = query_string
-    data_transfer_config = self._get_existing_transfer('scheduled_query',
-                                                       params=parameters)
     if data_transfer_config:
       logging.info('Data transfer for scheduling query "%s" already exists.', name)
-      return data_transfer_config
+      return self._update_existing_transfer(data_transfer_config, parameters)
     dataset_location = config_parser.get_dataset_location()
     parent = self.client.location_path(self.project_id, dataset_location)
     params = {
