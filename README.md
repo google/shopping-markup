@@ -121,11 +121,10 @@ Please provide following inputs when running the `setup.sh` script:
 *   [Google Ads External Customer Id](https://support.google.com/google-ads/answer/1704344?hl=en)
 
 *   Market Insights - whether to deploy Market Insights solution. Allowed Values - True or False
-  -
 
 ```
 cd shopping-markup;
-sh setup.sh --project_id=<project_id> --merchant_id=<merchant_id> --ads_customer_id=<ads_customer_id> --market_insights=True
+sh setup.sh --project_id=<project_id> --merchant_id=<merchant_id> --ads_customer_id=<ads_customer_id> --market_insights=False
 ```
 
 When installing, the script will check whether the current user has the proper
