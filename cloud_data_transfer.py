@@ -147,8 +147,9 @@ class CloudDataTransferUtils(object):
         return transfer_config
     return None
 
-  def _check_params_match(self, transfer_config: types.TransferConfig,
-                             params: Dict[str, str]) -> bool:
+  def _check_params_match(self,
+                          transfer_config: types.TransferConfig,
+                          params: Dict[str, str]) -> bool:
     """Checks if given parameters are present in transfer config.
 
     Args:
@@ -158,6 +159,8 @@ class CloudDataTransferUtils(object):
     Returns:
       True if given parameters are present in transfer config, False otherwise.
     """
+    if not params:
+      return True
     for key, value in params.items():
       config_params = transfer_config.params
       if key not in config_params or config_params[key] != value:
@@ -217,6 +220,9 @@ class CloudDataTransferUtils(object):
     parameters = struct_pb2.Struct()
     parameters['merchant_id'] = merchant_id
     parameters['export_products'] = True
+    if enable_market_insights:
+      parameters['export_price_benchmarks'] = True
+      parameters['export_best_sellers'] = True
     data_transfer_config = self._get_existing_transfer(_MERCHANT_CENTER_ID,
                                                        destination_dataset,
                                                        parameters)
@@ -224,10 +230,6 @@ class CloudDataTransferUtils(object):
       logging.info(
           'Data transfer for merchant id %s to destination dataset %s '
           'already exists.', merchant_id, destination_dataset)
-      if not enable_market_insights:
-        return data_transfer_config
-      parameters['export_price_benchmarks'] = True
-      parameters['export_best_sellers'] = True
       return self._update_existing_transfer(data_transfer_config, parameters)
     logging.info(
         'Creating data transfer for merchant id %s to destination dataset %s',

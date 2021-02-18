@@ -57,7 +57,24 @@ BEGIN
             `{project_id}.{dataset}.product_view_{merchant_id}` product_view
           INNER JOIN product_view.issues
         )
-        GROUP BY 1, 2, 3, 4),
+        GROUP BY 1, 2, 3, 4
+      ),
+      TargetedProduct AS (
+        SELECT
+          merchant_id,
+          product_id
+        FROM
+          `{project_id}.{dataset}.TargetedProduct_{external_customer_id}`
+        WHERE
+          data_date IN (
+          (
+            SELECT
+              MAX(data_date)
+            FROM
+              `{project_id}.{dataset}.TargetedProduct_{external_customer_id}`
+          )
+        )
+      ),
       ProductData AS (
       SELECT
         product_view.data_date,
@@ -148,20 +165,12 @@ BEGIN
           customer_view.externalcustomerid = product_metrics_view.externalcustomerid
           AND customer_view.data_date = customer_view.latest_date
       LEFT JOIN
-        `{project_id}.{dataset}.TargetedProduct_{external_customer_id}` TargetedProduct
+        TargetedProduct
         ON
           TargetedProduct.merchant_id = product_view.merchant_id
           AND TargetedProduct.product_id = product_view.product_id
       WHERE
         product_view.data_date = product_view.latest_date
-        AND TargetedProduct.data_date IN (
-          (
-            SELECT
-              MAX(data_date)
-            FROM
-              `{project_id}.{dataset}.TargetedProduct_{external_customer_id}`
-          )
-        )
       GROUP BY
         data_date,
         account_id,
