@@ -20,19 +20,25 @@
 
 CREATE OR REPLACE VIEW `{project_id}.{dataset}.product_view_{merchant_id}`
 AS (
-  WITH MultiChannelTable AS (
-    SELECT DISTINCT
-      _PARTITIONDATE,
-      merchant_id,
-      offer_id
-    FROM
-      `{project_id}.{dataset}.Products_{merchant_id}`
-    GROUP BY
-      _PARTITIONDATE,
-      merchant_id,
-      offer_id
-    HAVING COUNT(DISTINCT(channel)) > 1
-  )
+  WITH
+    MultiChannelTable AS (
+      SELECT DISTINCT
+        _PARTITIONDATE,
+        merchant_id,
+        offer_id
+      FROM
+        `{project_id}.{dataset}.Products_{merchant_id}`
+      GROUP BY
+        _PARTITIONDATE,
+        merchant_id,
+        offer_id
+      HAVING COUNT(DISTINCT(channel)) > 1
+    ), LatestDate AS (
+      SELECT
+        MAX(_PARTITIONDATE) AS latest_date
+      FROM
+        `{project_id}.{dataset}.Products_{merchant_id}`
+    )
   SELECT
     _PARTITIONDATE as data_date,
     MAX(_PARTITIONDATE) OVER () AS latest_date,
@@ -87,6 +93,7 @@ AS (
     IF(availability = 'in stock', 1, 0) AS in_stock,
     IF(MultiChannelTable.offer_id IS NULL, 'single_channel', 'multi_channel') AS channel_exclusivity
   FROM
-    `{project_id}.{dataset}.Products_{merchant_id}` AS Products
+    `{project_id}.{dataset}.Products_{merchant_id}` AS Products,
+    LatestDate
     LEFT JOIN MultiChannelTable USING (_PARTITIONDATE, offer_id, merchant_id)
 );

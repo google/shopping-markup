@@ -46,6 +46,7 @@ WITH
   ProductData AS (
   SELECT
     product_view.data_date,
+    product_view.latest_date,
     COALESCE(product_view.aggregator_id, product_view.merchant_id) AS account_id,
     MAX(customer_view.accountdescriptivename) AS account_display_name,
     product_view.merchant_id AS sub_account_id,
@@ -140,13 +141,13 @@ WITH
       AND TargetedProduct.data_date = product_view.data_date
   GROUP BY
     data_date,
+    latest_date,
     account_id,
     product_view.merchant_id,
     product_view.unique_product_id
 )
 SELECT
   *,
-  MAX(data_date) OVER () AS latest_date,
   CASE
     WHEN is_approved = 1 AND in_stock = 1
       THEN 1
