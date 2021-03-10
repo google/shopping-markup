@@ -61,13 +61,19 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.product_metrics_view`
           externalcustomerid,
           merchantid,
           product_id
+      ),
+      LatestDate AS (
+        SELECT
+          MAX(_DATA_DATE) AS latest_date
+        FROM
+           `{project_id}.{dataset}.ShoppingProductStats_{external_customer_id}`
       )
     SELECT
       _DATA_DATE AS data_date,
       externalcustomerid,
       merchantid,
       product_id,
-      MAX(_DATA_DATE) OVER () AS latest_date,
+      LatestDate.latest_date,
       SUM(impressions)
         OVER (
           PARTITION BY externalcustomerid, merchantid, product_id
@@ -99,7 +105,8 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.product_metrics_view`
           RANGE BETWEEN 30 PRECEDING AND CURRENT ROW
         ) AS conversions_value_30_days
     FROM
-      ProductMetric
+      ProductMetric,
+      LatestDate
     ORDER BY
       data_date,
       externalcustomerid,
