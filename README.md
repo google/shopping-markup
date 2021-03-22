@@ -150,18 +150,12 @@ During the installation process, the script will do following:
 
 ## 2.3. Configure Data Sources
 
-You will need to create required Data Source(s) in Data Studio:
+You will need to create or copy required Data Source(s) in Data Studio:
 
-For Markup:
+### For Markup:
 
-* Create `product_detailed_materialized` Data Source (linked to `markup.product_detailed_materialized`)
-* Create `product_historical_materialized` Data Source (linked to `markup.product_historical_materialized`)
-
-For Merchant Market Insights:
-
-* Create `market_insights_snapshot_view` Data Source (linked to `markup.market_insights_snapshot_view`)
-* Create `market_insights_historical_view` Data Source (linked to `markup.market_insights_historical_view`)
-* Create `market_insights_best_sellers_view` Data Source (linked to `markup.market_insights_best_sellers_view`)
+*   Create `product_detailed_materialized` Data Source (linked to `markup.product_detailed_materialized`)
+*   Create `product_historical_materialized` Data Source (linked to `markup.product_historical_materialized`)
 
 To create a data source:
 
@@ -180,9 +174,29 @@ To create a data source:
 *   Click `Connect` on the top right corner and wait for the data-source to be
     created
 
+### For Merchant Market Insights:
+
+*   Copy [Market Insights Snapshot (TEMPLATE)](https://datastudio.google.com/datasources/f0a48921-7b4f-49e6-96e9-0dbe42d878c0) and connect it to `markup.market_insights_snapshot_view`
+*   Copy [Market Insights Historical (TEMPLATE)](https://datastudio.google.com/datasources/b7cf437c-72a4-4adf-9c3b-0d8e01527f8d) and connect it to `markup.market_insights_historical_view`
+*   Copy  [Market Insights Best Sellers (TEMPLATE)](https://datastudio.google.com/datasources/18b80bd5-3112-4d08-806b-002620e2d070) and connect it to `markup.market_insights_best_sellers_view`
+
+To copy a data source:
+
+*  Click on the data source template link above.
+
+*  Click on the  <img src="images/copy_icon.png">  icon in the top right corner next to "Create Report".
+
+*  Click "Copy Data Source" on the "Copy Data Source" pop-up.
+
+*  Select your Project, Dataset, and Table to be connected, then press "Reconnect" in the top right corner.
+
+*  Click "Apply" on the "Apply Connection Changes" pop-up
+
+*  Repeat this process for all three data source templates above.
+
 ## 2.4. Create Data-Studio Dashboard(s)
 
-For Markup:
+### For Markup:
 
 *   Click on the following link to the Data Studio template:
     [link](https://datastudio.google.com/u/0/reporting/18d17eeb-3e4e-4bdd-a27e-bb20b0b68670/preview)
@@ -193,14 +207,14 @@ For Markup:
 
 *   Click "`Copy Report`"
 
-For Merchant Market Insights:
+### For Merchant Market Insights:
 
 *   Click on the following link to the Data Studio template:
     [link](https://datastudio.google.com/reporting/37411ae9-b5f3-4062-89ea-ea521c885c30/page/QK7kB/preview)
 
 *   Click "`Use Template`"
 
-*   Choose the three data-sources created in the previous step
+*   Choose the three data-sources copied in the previous step
 
 *   Click "`Copy Report`"
 
