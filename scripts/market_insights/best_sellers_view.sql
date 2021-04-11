@@ -60,7 +60,7 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_best_sellers_view
             `{project_id}.{dataset}.BestSellers_TopProducts_{merchant_id}`
         )
         # Adjust as necessary for other locales
-        AND product_title.locale IN ("en-US", null)
+        AND (product_title.locale IN ("en-US") OR product_title.locale IS NULL)
         AND google_product_category_path.locale = "en-US"
         AND ranking_category_path.locale  = "en-US"
     ),
