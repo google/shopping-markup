@@ -28,87 +28,35 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.product_metrics_view`
           language_code
         FROM
           `{project_id}.{dataset}.language_codes`
-      ),
-      ProductMetric AS (
-        SELECT
-          _DATA_DATE,
-          externalcustomerid,
-          merchantid,
-          CONCAT(
-            channel,
-            ':',
-            LanguageTable.language_code,
-            ':',
-            CountryTable.country_code,
-            ':',
-            offerid) AS product_id,
-          SUM(impressions) AS impressions,
-          SUM(clicks) AS clicks,
-          SUM(cost) AS cost,
-          SUM(conversions) AS conversions,
-          SUM(ConversionValue) AS conversions_value,
-        FROM
-          `{project_id}.{dataset}.ShoppingProductStats_{external_customer_id}`
-            AS ShoppingProductStats
-        INNER JOIN
-          CountryTable
-          ON CountryTable.country_criterion = ShoppingProductStats.countrycriteriaid
-        INNER JOIN
-          LanguageTable
-          ON CAST(LanguageTable.language_criterion AS STRING) = ShoppingProductStats.languagecriteriaid
-        GROUP BY
-          _DATA_DATE,
-          externalcustomerid,
-          merchantid,
-          product_id
-      ),
-      LatestDate AS (
-        SELECT
-          MAX(_DATA_DATE) AS latest_date
-        FROM
-           `{project_id}.{dataset}.ShoppingProductStats_{external_customer_id}`
       )
     SELECT
       _DATA_DATE AS data_date,
       externalcustomerid,
       merchantid,
-      product_id,
-      LatestDate.latest_date,
-      SUM(impressions)
-        OVER (
-          PARTITION BY externalcustomerid, merchantid, product_id
-          ORDER BY DATE_DIFF(_DATA_DATE, CURRENT_DATE(), DAY)
-          RANGE BETWEEN 30 PRECEDING AND CURRENT ROW
-        ) AS impressions_30_days,
-      SUM(clicks)
-        OVER (
-          PARTITION BY externalcustomerid, merchantid, product_id
-          ORDER BY DATE_DIFF(_DATA_DATE, CURRENT_DATE(), DAY)
-          RANGE BETWEEN 30 PRECEDING AND CURRENT ROW
-        ) AS clicks_30_days,
-      SUM(cost)
-        OVER (
-          PARTITION BY externalcustomerid, merchantid, product_id
-          ORDER BY DATE_DIFF(_DATA_DATE, CURRENT_DATE(), DAY)
-          RANGE BETWEEN 30 PRECEDING AND CURRENT ROW
-        ) AS cost_30_days,
-      SUM(conversions)
-        OVER (
-          PARTITION BY externalcustomerid, merchantid, product_id
-          ORDER BY DATE_DIFF(_DATA_DATE, CURRENT_DATE(), DAY)
-          RANGE BETWEEN 30 PRECEDING AND CURRENT ROW
-        ) AS conversions_30_days,
-      SUM(conversions_value)
-        OVER (
-          PARTITION BY externalcustomerid, merchantid, product_id
-          ORDER BY DATE_DIFF(_DATA_DATE, CURRENT_DATE(), DAY)
-          RANGE BETWEEN 30 PRECEDING AND CURRENT ROW
-        ) AS conversions_value_30_days
+      CONCAT(
+        channel,
+        ':',
+        LanguageTable.language_code,
+        ':',
+        CountryTable.country_code,
+        ':',
+        offerid) AS product_id,
+      SUM(impressions) AS impressions,
+      SUM(clicks) AS clicks,
+      SUM(cost) AS cost,
+      SUM(conversions) AS conversions,
+      SUM(ConversionValue) AS conversions_value
     FROM
-      ProductMetric,
-      LatestDate
-    ORDER BY
-      data_date,
+      `{project_id}.{dataset}.ShoppingProductStats_{external_customer_id}`
+        AS ShoppingProductStats
+    INNER JOIN
+      CountryTable
+      ON CountryTable.country_criterion = ShoppingProductStats.countrycriteriaid
+    INNER JOIN
+      LanguageTable
+      ON CAST(LanguageTable.language_criterion AS STRING) = ShoppingProductStats.languagecriteriaid
+    GROUP BY
+      _DATA_DATE,
       externalcustomerid,
       merchantid,
       product_id
