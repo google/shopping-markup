@@ -132,7 +132,7 @@ def main():
   }
   query = cloud_bigquery.get_main_workflow_sql(
     args.project_id, args.dataset_id, args.merchant_id, ads_customer_id)
-  data_transfer.schedule_query(f'Main workflow - {ads_customer_id}',
+  data_transfer.schedule_query(f'Main workflow - {args.dataset_id} - {ads_customer_id}',
                                query)
   logging.info('Job created to run markup main workflow.')
 
