@@ -199,7 +199,7 @@ To copy a data source:
 ### For Markup:
 
 *   Click on the following link to the Data Studio template:
-    [link](https://datastudio.google.com/u/0/reporting/18d17eeb-3e4e-4bdd-a27e-bb20b0b68670/preview)
+    [link](https://datastudio.google.com/u/0/reporting/447df1d0-6f3d-4732-ac26-dc8e494d80fb/preview)
 
 *   Click "`Use Template`"
 
