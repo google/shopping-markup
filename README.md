@@ -21,7 +21,7 @@ ads performance.
 
 ## 1. Overview
 
-MarkUp solution is built for Google Shopping customers to take actionable
+MarkUp solution is built for Shopping Ads customers to take actionable
 data-driven decisions to improve their feed health and shopping ads performance.
 
 ### 1.1. Value Proposition
