@@ -33,14 +33,10 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.product_metrics_view`
       _DATA_DATE AS data_date,
       externalcustomerid,
       merchantid,
-      CONCAT(
-        channel,
-        ':',
-        LanguageTable.language_code,
-        ':',
-        CountryTable.country_code,
-        ':',
-        offerid) AS product_id,
+      channel,
+      LanguageTable.language_code,
+      CountryTable.country_code,
+      offerid AS offer_id,
       SUM(impressions) AS impressions,
       SUM(clicks) AS clicks,
       SUM(cost) AS cost,
@@ -59,5 +55,8 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.product_metrics_view`
       _DATA_DATE,
       externalcustomerid,
       merchantid,
-      product_id
+      channel,
+      LanguageTable.language_code,
+      CountryTable.country_code,
+      offer_id
 );
