@@ -131,7 +131,7 @@ When installing, the script will check whether the current user has the proper
 authorization to continue. It may ask you to open cloud authorization URL in the
 browser. Please follow the instructions as mentioned in the command line.
 
-#### Note - If the script fails when you run it for the first time, it might be due to delay in preparing Merchant account data. Please wait up to 90 minutes before re-running the script.
+#### Note - If the script fails when you run it for the first time, it might be due to delay in preparing Merchant account data. Please wait up to 1-3 days before re-running the script.
 
 During the installation process, the script will do following:
 
@@ -146,7 +146,10 @@ During the installation process, the script will do following:
 *   Create recurring data transfer jobs so that the latest data is imported in
     near real time.
 
-*   Create MarkUp specific SQL views.
+*   Create following MarkUp specific SQL tables.
+    *   product_detailed_materialized - Latest snapshot view of products combined with performance metrics. Each offer is split into rows for each targeted country, rows are keyed by unique_product_id and target_country.
+    *   product_historical_materialized - Historic snapshot of performance metrics at a product category level.
+
 
 ## 2.3. Configure Data Sources
 
@@ -199,7 +202,7 @@ To copy a data source:
 ### For Markup:
 
 *   Click on the following link to the Data Studio template:
-    [link](https://datastudio.google.com/u/0/reporting/447df1d0-6f3d-4732-ac26-dc8e494d80fb/preview)
+    [link](https://datastudio.google.com/reporting/22c41768-140b-4572-9bf7-4e7e1891a8dd/preview)
 
 *   Click "`Use Template`"
 
