@@ -1,4 +1,4 @@
-# Copyright 2020 Google LLC..
+# Copyright 2021 Google LLC..
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
--- Creates a view based on Best Sellers Products tables
-CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_best_sellers_view` AS
-(
+CREATE OR REPLACE TABLE `{project_id}.{dataset}.market_insights_best_sellers_materialized` AS (
   WITH
     best_sellers AS (
       SELECT
@@ -54,11 +52,7 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_best_sellers_view
       JOIN b.ranking_category_path ranking_category_path
       JOIN b.product_title product_title
       WHERE
-        _PARTITIONDATE IN (
-          SELECT MAX(_PARTITIONDATE)
-            FROM
-            `{project_id}.{dataset}.BestSellers_TopProducts_{merchant_id}`
-        )
+        _PARTITIONDATE = DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY)
         # Adjust as necessary for other locales
         AND (product_title.locale IN ("en-US") OR product_title.locale IS NULL)
         AND google_product_category_path.locale = "en-US"
@@ -70,11 +64,7 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_best_sellers_view
       FROM
         `{project_id}.{dataset}.BestSellers_TopProducts_Inventory_{merchant_id}`
       WHERE
-        _PARTITIONDATE IN (
-          SELECT MAX(_PARTITIONDATE)
-          FROM
-            `{project_id}.{dataset}.BestSellers_TopProducts_{merchant_id}`
-        )
+        _PARTITIONDATE = DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY)
     )
   SELECT
     best_sellers.*,

@@ -135,7 +135,13 @@ def main():
   data_transfer.schedule_query(f'Main workflow - {args.dataset_id} - {ads_customer_id}',
                                query)
   logging.info('Job created to run markup main workflow.')
-
+  if args.market_insights:
+    logging.info('Market insights requested, creating scheduled query')
+    best_sellers_query = cloud_bigquery.get_best_sellers_workflow_sql(
+        args.project_id, args.dataset_id, args.merchant_id)
+    data_transfer.schedule_query(
+        f'Best sellers workflow - {args.dataset_id} - {args.merchant_id}',best_sellers_query)
+    logging.info('Job created to run best sellers workflow.')
   logging.info('MarkUp installation is complete!')
 
 

@@ -26,6 +26,7 @@ import config_parser
 
 # Main workflow sql.
 _MAIN_WORKFLOW_SQL = 'scripts/main_workflow.sql'
+_BEST_SELLERS_WORKFLOW_SQL = 'scripts/market_insights/best_sellers_workflow.sql'
 
 # Set logging level.
 logging.getLogger().setLevel(logging.INFO)
@@ -149,8 +150,7 @@ def execute_queries(project_id: str, dataset_id: str, merchant_id: str,
   if enable_market_insights:
     market_insights_sql_files = [
       'market_insights/snapshot_view.sql',
-      'market_insights/historical_view.sql',
-      'market_insights/best_sellers_view.sql'
+      'market_insights/historical_view.sql'
     ]
     sql_files.extend(market_insights_sql_files)
   prefix = 'scripts'
@@ -189,3 +189,20 @@ def get_main_workflow_sql(project_id: str, dataset_id: str, merchant_id: str,
       'external_customer_id': customer_id
   }
   return configure_sql(_MAIN_WORKFLOW_SQL, query_params)
+
+
+def get_best_sellers_workflow_sql(project_id: str, dataset_id: str,
+                                  merchant_id: str) -> str:
+  """Returns main workflow sql.
+
+  Args:
+    project_id: A cloud project id.
+    dataset_id: BigQuery dataset id.
+    merchant_id: Merchant center id.
+  """
+  query_params = {
+      'project_id': project_id,
+      'dataset': dataset_id,
+      'merchant_id': merchant_id
+  }
+  return configure_sql(_BEST_SELLERS_WORKFLOW_SQL, query_params)
