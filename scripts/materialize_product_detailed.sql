@@ -31,34 +31,6 @@ BEGIN
   CREATE OR REPLACE TABLE `{project_id}.{dataset}.product_detailed_materialized`
   AS (
     WITH
-      ProductIssuesTable AS (
-        SELECT
-          data_date,
-          merchant_id,
-          unique_product_id,
-          servability,
-          STRING_AGG(
-            IF(LOWER(servability) = 'disapproved', short_description, NULL), ", ")
-            AS disapproval_issues,
-          STRING_AGG(
-            IF(LOWER(servability) = 'demoted', short_description, NULL), ", ")
-            AS demotion_issues,
-          STRING_AGG(
-            IF(LOWER(servability) = 'unaffected', short_description, NULL), ", ")
-            AS warning_issues
-        FROM (
-          SELECT
-            data_date,
-            merchant_id,
-            unique_product_id,
-            servability,
-            short_description,
-          FROM
-            `{project_id}.{dataset}.product_view_{merchant_id}` product_view
-          INNER JOIN product_view.issues
-        )
-        GROUP BY 1, 2, 3, 4
-      ),
       TargetedProduct AS (
         SELECT
           merchant_id,
@@ -91,7 +63,10 @@ BEGIN
           `{project_id}.{dataset}.product_view_{merchant_id}` product_view
           ON
             product_metrics_view.merchantid = product_view.merchant_id
-            AND LOWER(product_metrics_view.product_id) = LOWER(product_view.product_id)
+            AND LOWER(product_metrics_view.channel) = LOWER(product_view.channel)
+            AND LOWER(product_metrics_view.language_code) = LOWER(product_view.content_language)
+            AND LOWER(product_metrics_view.country_code) = LOWER(product_view.target_country)
+            AND LOWER(product_metrics_view.offer_id) = LOWER(product_view.offer_id)
             AND product_metrics_view.data_date
               BETWEEN DATE_SUB(product_view.latest_date, INTERVAL 30 DAY)
               AND product_view.latest_date
@@ -110,17 +85,14 @@ BEGIN
           MAX(customer_view.accountdescriptivename) AS account_display_name,
           product_view.merchant_id AS sub_account_id,
           product_view.unique_product_id,
+          target_country,
           MAX(product_view.offer_id) AS offer_id,
           MAX(product_view.channel) AS channel,
           MAX(product_view.in_stock) AS in_stock,
           # An offer is labeled as approved when able to serve on all destinations
-          MAX(CASE
-              WHEN LOWER(destinations.status) <> 'approved' THEN 0
-            ELSE
-            1
-          END
-            ) AS is_approved,
+          MAX(is_approved) AS is_approved,
           # Aggregated Issues & Servability Statuses
+          MAX(servability) AS servability,
           MAX(disapproval_issues) as disapproval_issues,
           MAX(demotion_issues) as demotion_issues,
           MAX(warning_issues) as warning_issues,
@@ -153,7 +125,6 @@ BEGIN
           MAX(image_link) AS image_link,
           ANY_VALUE(additional_image_links) AS additional_image_links,
           MAX(content_language) AS content_language,
-          MAX(target_country) AS target_country,
           MAX(expiration_date) AS expiration_date,
           MAX(google_expiration_date) AS google_expiration_date,
           MAX(adult) AS adult,
@@ -170,17 +141,9 @@ BEGIN
           MAX(pattern) AS pattern,
           ANY_VALUE(price) AS price,
           ANY_VALUE(sale_price) AS sale_price,
-          ANY_VALUE(additional_product_types) AS additional_product_types,
-          ANY_VALUE(issues) AS issues
+          ANY_VALUE(additional_product_types) AS additional_product_types
         FROM
-          `{project_id}.{dataset}.product_view_{merchant_id}` product_view,
-          UNNEST(destinations) AS destinations
-        LEFT JOIN
-          ProductIssuesTable
-          ON
-            ProductIssuesTable.merchant_id = product_view.merchant_id
-            AND ProductIssuesTable.unique_product_id = product_view.unique_product_id
-            AND ProductIssuesTable.data_date = product_view.data_date
+          `{project_id}.{dataset}.product_view_{merchant_id}` product_view
         LEFT JOIN
           ProductMetrics
           ON
@@ -203,7 +166,8 @@ BEGIN
           latest_date,
           account_id,
           product_view.merchant_id,
-          product_view.unique_product_id
+          product_view.unique_product_id,
+          product_view.target_country
       )
     SELECT
       *,

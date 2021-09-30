@@ -26,12 +26,13 @@ BEGIN
       product_type_l3,
       product_type_l4,
       product_type_l5,
-      COUNT(1) AS total_products,
-      SUM(is_approved) AS total_approved,
-      SUM(funnel_in_stock) AS total_in_stock,
-      SUM(funnel_targeted) AS total_targeted,
-      SUM(funnel_has_impression) AS total_products_with_impressions_in_30_days,
-      SUM(funnel_has_clicks) AS total_products_with_clicks_in_30_days,
+      target_country,
+      COUNT(DISTINCT unique_product_id) AS total_products,
+      COUNT(DISTINCT IF(is_approved = 1, unique_product_id, NULL)) AS total_approved,
+      COUNT(DISTINCT IF(funnel_in_stock = 1, unique_product_id, NULL)) AS total_in_stock,
+      COUNT(DISTINCT IF(funnel_targeted = 1, unique_product_id, NULL)) AS total_targeted,
+      COUNT(DISTINCT IF(funnel_has_impression = 1, unique_product_id, NULL)) AS total_products_with_impressions_in_30_days,
+      COUNT(DISTINCT IF(funnel_has_clicks = 1, unique_product_id, NULL)) AS total_products_with_clicks_in_30_days,
       IFNULL(SUM(impressions_30_days), 0) AS total_impressions_30_days,
       IFNULL(SUM(clicks_30_days), 0) AS total_clicks_30_days,
       IFNULL(SUM(cost_30_days), 0) AS total_cost_30_days
@@ -46,7 +47,8 @@ BEGIN
       product_type_l2,
       product_type_l3,
       product_type_l4,
-      product_type_l5
+      product_type_l5,
+      target_country
   );
 END;
 
