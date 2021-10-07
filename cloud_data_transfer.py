@@ -337,7 +337,16 @@ class CloudDataTransferUtils(object):
     parameters['query'] = query_string
     if data_transfer_config:
       logging.info('Data transfer for scheduling query "%s" already exists.', name)
-      return self._update_existing_transfer(data_transfer_config, parameters)
+      updated_transfer_config = self._update_existing_transfer(data_transfer_config, parameters)
+      logging.info('Data transfer for scheduling query "%s" updated.', name)
+      start_time_pb = timestamp_pb2.Timestamp()
+      start_time = datetime.datetime.now(tz=pytz.utc)
+      start_time_pb.FromDatetime(start_time)
+      self.client.start_manual_transfer_runs(parent=updated_transfer_config.name,
+                                             requested_run_time=start_time_pb)
+      logging.info('One time manual run started. It might take upto 1 hour for performance data'
+                   ' to reflect on the dash.')
+      return updated_transfer_config
     dataset_location = config_parser.get_dataset_location()
     parent = self.client.location_path(self.project_id, dataset_location)
     params = {

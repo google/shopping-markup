@@ -142,7 +142,8 @@ AS (
   SELECT
     ProductView.data_date,
     ProductView.product_id,
-    ProductView.merchant_id
+    ProductView.merchant_id,
+    ProductView.target_country
   FROM
     `{project_id}.{dataset}.product_view_{merchant_id}` AS ProductView
   INNER JOIN IdTargetedOffer
@@ -166,7 +167,8 @@ AS (
   SELECT
     ProductView.data_date,
     ProductView.product_id,
-    ProductView.merchant_id
+    ProductView.merchant_id,
+    ProductView.target_country
   FROM
     `{project_id}.{dataset}.product_view_{merchant_id}` AS ProductView
   INNER JOIN CriteriaInfo
@@ -249,19 +251,22 @@ INSERT `{project_id}.{dataset}.TargetedProduct_{external_customer_id}`
 (
   data_date,
   product_id,
-  merchant_id
+  merchant_id,
+  target_country
 )
 SELECT
   data_date,
   product_id,
-  merchant_id
+  merchant_id,
+  target_country
 FROM
   IdTargeted
 UNION ALL
 SELECT
   data_date,
   product_id,
-  merchant_id
+  merchant_id,
+  target_country
 FROM
   NonIdTargeted;
 
