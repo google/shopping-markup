@@ -27,6 +27,7 @@ BEGIN
       product_type_l4,
       product_type_l5,
       target_country,
+      channel,
       COUNT(DISTINCT unique_product_id) AS total_products,
       COUNT(DISTINCT IF(is_approved = 1, unique_product_id, NULL)) AS total_approved,
       COUNT(DISTINCT IF(funnel_in_stock = 1, unique_product_id, NULL)) AS total_in_stock,
@@ -48,7 +49,8 @@ BEGIN
       product_type_l3,
       product_type_l4,
       product_type_l5,
-      target_country
+      target_country,
+      channel
   );
 END;
 

@@ -34,7 +34,8 @@ BEGIN
       TargetedProduct AS (
         SELECT
           merchant_id,
-          product_id
+          product_id,
+          target_country
         FROM
           `{project_id}.{dataset}.TargetedProduct_{external_customer_id}`
         WHERE
@@ -52,6 +53,7 @@ BEGIN
           product_view.latest_date,
           product_view.unique_product_id,
           product_metrics_view.externalcustomerid,
+          product_view.target_country,
           SUM(product_metrics_view.impressions) AS impressions_30_days,
           SUM(product_metrics_view.clicks) AS clicks_30_days,
           SUM(product_metrics_view.cost) AS cost_30_days,
@@ -75,7 +77,8 @@ BEGIN
         GROUP BY
           latest_date,
           unique_product_id,
-          externalcustomerid
+          externalcustomerid,
+          target_country
       ),
       ProductData AS (
         SELECT
@@ -85,14 +88,13 @@ BEGIN
           MAX(customer_view.accountdescriptivename) AS account_display_name,
           product_view.merchant_id AS sub_account_id,
           product_view.unique_product_id,
-          target_country,
+          product_view.target_country,
           MAX(product_view.offer_id) AS offer_id,
           MAX(product_view.channel) AS channel,
           MAX(product_view.in_stock) AS in_stock,
           # An offer is labeled as approved when able to serve on all destinations
           MAX(is_approved) AS is_approved,
           # Aggregated Issues & Servability Statuses
-          MAX(servability) AS servability,
           MAX(disapproval_issues) as disapproval_issues,
           MAX(demotion_issues) as demotion_issues,
           MAX(warning_issues) as warning_issues,
@@ -149,6 +151,7 @@ BEGIN
           ON
             ProductMetrics.latest_date = product_view.data_date
             AND ProductMetrics.unique_product_id = product_view.unique_product_id
+            AND ProductMetrics.target_country = product_view.target_country
         LEFT JOIN
           `{project_id}.{dataset}.customer_view` customer_view
           ON
@@ -159,6 +162,7 @@ BEGIN
           ON
             TargetedProduct.merchant_id = product_view.merchant_id
             AND TargetedProduct.product_id = product_view.product_id
+            AND TargetedProduct.target_country = product_view.target_country
         WHERE
           product_view.data_date = product_view.latest_date
         GROUP BY

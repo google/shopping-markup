@@ -19,7 +19,8 @@ CREATE OR REPLACE TABLE `{project_id}.{dataset}.TargetedProduct_{external_custom
 (
   data_date DATE,
   product_id STRING,
-  merchant_id INT64
+  merchant_id INT64,
+  target_country STRING
 );
 
 -- DDL definition for ParsedCriteria table.
