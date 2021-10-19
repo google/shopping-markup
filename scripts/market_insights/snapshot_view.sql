@@ -18,20 +18,21 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_snapshot_view` AS
     price_benchmarks AS (
       SELECT
         pb.data_date AS data_date,
-        unique_product_id,
-        price_benchmark_value,
-        price_benchmark_currency,
-        price_benchmark_timestamp,
+        pb.unique_product_id,
+        pb.target_country,
+        pb.price_benchmark_value,
+        pb.price_benchmark_currency,
+        pb.price_benchmark_timestamp,
         CASE
-          WHEN price_benchmark_value IS NULL THEN ''
-          WHEN (SAFE_DIVIDE(product.price.value, price_benchmark_value) - 1) < -0.01 THEN 'Less than PB' -- ASSUMPTION: Enter % as a decimal here
-          WHEN (SAFE_DIVIDE(product.price.value, price_benchmark_value) - 1) > 0.01 THEN 'More than PB' -- ASSUMPTION: Enter % as a decimal here
+          WHEN pb.price_benchmark_value IS NULL THEN ''
+          WHEN (SAFE_DIVIDE(product.price.value, pb.price_benchmark_value) - 1) < -0.01 THEN 'Less than PB' -- ASSUMPTION: Enter % as a decimal here
+          WHEN (SAFE_DIVIDE(product.price.value, pb.price_benchmark_value) - 1) > 0.01 THEN 'More than PB' -- ASSUMPTION: Enter % as a decimal here
           ELSE 'Equal to PB'
         END AS price_competitiveness_band,
-        SAFE_DIVIDE(product.price.value, price_benchmark_value) - 1 AS price_vs_benchmark,
-        SAFE_DIVIDE(product.price.value, price_benchmark_value) - 1 AS sale_price_vs_benchmark,
+        SAFE_DIVIDE(product.price.value, pb.price_benchmark_value) - 1 AS price_vs_benchmark,
+        SAFE_DIVIDE(product.price.value, pb.price_benchmark_value) - 1 AS sale_price_vs_benchmark,
       FROM `{project_id}.{dataset}.product_detailed_materialized` product
-      JOIN (
+      INNER JOIN (
         SELECT
           _PARTITIONDATE as data_date,
           CONCAT(CAST(merchant_id AS STRING), '|', product_id) AS unique_product_id,
@@ -40,39 +41,33 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_snapshot_view` AS
           price_benchmark_currency,
           price_benchmark_timestamp
         FROM `{project_id}.{dataset}.Products_PriceBenchmarks_{merchant_id}`
-        WHERE _PARTITIONDATE IN (
-          (
-            SELECT MAX(_PARTITIONDATE)
-            FROM
-              `{project_id}.{dataset}.Products_PriceBenchmarks_{merchant_id}`
-          )
-        )
       ) pb
-      USING (unique_product_id, target_country)
+      ON
+        product.unique_product_id = pb.unique_product_id
+        AND product.target_country = pb.target_country
+        AND product.latest_date = pb.data_date
     ),
     best_sellers AS (
       SELECT DISTINCT
         _PARTITIONDATE AS data_date,
         CONCAT(CAST(merchant_id AS STRING), '|', product_id) AS unique_product_id,
+        SPLIT(rank_id, ':')[SAFE_ORDINAL(2)] AS target_country,
         TRUE as is_best_seller,
       FROM
         `{project_id}.{dataset}.BestSellers_TopProducts_Inventory_{merchant_id}`
-      WHERE
-        _PARTITIONDATE IN (
-          (
-            SELECT MAX(_PARTITIONDATE)
-            FROM
-              `{project_id}.{dataset}.BestSellers_TopProducts_Inventory_{merchant_id}`
-          )
-        )
-        -- Filters for best seller status when target country = rank country
-        AND SPLIT(product_id, ':')[SAFE_ORDINAL(3)] = SPLIT(rank_id, ':')[SAFE_ORDINAL(2)]
+      WHERE _PARTITIONDATE = DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY)
     )
   SELECT
     product,
     price_benchmarks,
     best_sellers,
   FROM `{project_id}.{dataset}.product_detailed_materialized` product
-  LEFT JOIN price_benchmarks USING (unique_product_id)
-  LEFT JOIN best_sellers USING (unique_product_id)
+  LEFT JOIN price_benchmarks
+    ON product.unique_product_id = price_benchmarks.unique_product_id
+    AND product.target_country = price_benchmarks.target_country
+    AND product.latest_date = price_benchmarks.data_date
+  LEFT JOIN best_sellers
+    ON product.unique_product_id = best_sellers.unique_product_id
+    AND product.target_country = best_sellers.target_country
+    AND product.latest_date = best_sellers.data_date
 );
