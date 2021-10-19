@@ -2,6 +2,9 @@
 
 Disclaimer: This is not an officially supported Google product.
 
+### Please re-install MarkUp if you have installed it before <b>Oct 2021</b>. This is to support the breaking schema changes in BigQuery Data Transfer Service.
+<br />
+
 MarkUp is a tool to enable retailers grow their business using
 [Google Merchant Center](https://www.google.com/retail/solutions/merchant-center/)
 by taking actionable data-driven decisions to optimize shopping feed health and
