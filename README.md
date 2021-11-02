@@ -182,9 +182,9 @@ To create a data source:
 
 ### For Merchant Market Insights:
 
-*   Copy [Market Insights Snapshot (TEMPLATE)](https://datastudio.google.com/datasources/f0a48921-7b4f-49e6-96e9-0dbe42d878c0) and connect it to `markup.market_insights_snapshot_view`
-*   Copy [Market Insights Historical (TEMPLATE)](https://datastudio.google.com/datasources/b7cf437c-72a4-4adf-9c3b-0d8e01527f8d) and connect it to `markup.market_insights_historical_view`
-*   Copy  [Market Insights Best Sellers (TEMPLATE)](https://datastudio.google.com/datasources/18b80bd5-3112-4d08-806b-002620e2d070) and connect it to `markup.market_insights_best_sellers_materialized`
+*   Copy [Market Insights Snapshot (TEMPLATE)](https://datastudio.google.com/datasources/9dbdb290-0ea6-4d81-90df-5e4f9ec6f504) and connect it to `markup.market_insights_snapshot_view`
+*   Copy [Market Insights Historical (TEMPLATE)](https://datastudio.google.com/datasources/0397b27f-96b8-44cd-afca-645f64882a26) and connect it to `markup.market_insights_historical_view`
+*   Copy  [Market Insights Best Sellers (TEMPLATE)](https://datastudio.google.com/datasources/b2f5bafe-01e2-4e30-bfb3-022a6c2f3ad6) and connect it to `markup.market_insights_best_sellers_materialized`
 
 To copy a data source:
 
@@ -216,7 +216,7 @@ To copy a data source:
 ### For Merchant Market Insights:
 
 *   Click on the following link to the Data Studio template:
-    [link](https://datastudio.google.com/reporting/37411ae9-b5f3-4062-89ea-ea521c885c30/page/QK7kB/preview)
+    [link](https://datastudio.google.com/reporting/806b9d3e-073a-43c2-bba0-53a0eb65302f/page/QK7kB/preview)
 
 *   Click "`Use Template`"
 
