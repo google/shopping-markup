@@ -32,7 +32,6 @@ LANGUAGE js AS """
         index = result[0].match(customLabelRegex)[1];
         value = result[1]
         if(value != '*') {{
-          value = value.replace('"', '\\"');
           parsedCriteria['custom_label' + index] = value;
         }}
       }}
@@ -50,7 +49,6 @@ LANGUAGE js AS """
         index = result[0].match(productTypeRegex)[1];
         value = result[1]
         if(value != '*') {{
-          value = value.replace('"', '\\"');
           parsedCriteria['product_type_l' + index] = value;
         }}
       }}
@@ -61,7 +59,6 @@ LANGUAGE js AS """
         index = result[0].match(categoryRegex)[1];
         value = result[1]
         if(value != '*') {{
-          value = value.replace('"', '\\"');
           parsedCriteria['google_product_category_l' + index] = value;
         }}
       }}
@@ -102,6 +99,7 @@ LANGUAGE js AS """
   sql = 'INSERT INTO `{project_id}.{dataset}.ParsedCriteria_{external_customer_id}` VALUES ';
   i = 0;
   for (criterion of criterions) {{
+    criterion = criterion.replace(/"/g, '\\\\"');
     parsedCriteria = getParsedCriteria(criterion)
     if ( i!=0 ) {{
       sql += ',';
