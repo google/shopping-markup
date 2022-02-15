@@ -133,6 +133,8 @@ AS (
         Products.pattern,
         Products.price,
         Products.sale_price,
+        Products.sale_price_effective_start_date,
+        Products.sale_price_effective_end_date,
         Products.google_product_category,
         Products.google_product_category_path,
         Products.product_type,

@@ -25,13 +25,27 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_snapshot_view` AS
         pb.price_benchmark_timestamp,
         CASE
           WHEN pb.price_benchmark_value IS NULL THEN ''
-          WHEN (SAFE_DIVIDE(product.price.value, pb.price_benchmark_value) - 1) < -0.01 THEN 'Less than PB' -- ASSUMPTION: Enter % as a decimal here
-          WHEN (SAFE_DIVIDE(product.price.value, pb.price_benchmark_value) - 1) > 0.01 THEN 'More than PB' -- ASSUMPTION: Enter % as a decimal here
+          WHEN (SAFE_DIVIDE(product.effective_price_value, pb.price_benchmark_value) - 1) < -0.01
+            THEN 'Less than PB'  -- ASSUMPTION: Enter % as a decimal here
+          WHEN (SAFE_DIVIDE(product.effective_price_value, pb.price_benchmark_value) - 1) > 0.01
+            THEN 'More than PB'  -- ASSUMPTION: Enter % as a decimal here
           ELSE 'Equal to PB'
-        END AS price_competitiveness_band,
-        SAFE_DIVIDE(product.price.value, pb.price_benchmark_value) - 1 AS price_vs_benchmark,
-        SAFE_DIVIDE(product.price.value, pb.price_benchmark_value) - 1 AS sale_price_vs_benchmark,
-      FROM `{project_id}.{dataset}.product_detailed_materialized` product
+          END AS price_competitiveness_band,
+        SAFE_DIVIDE(product.effective_price_value, pb.price_benchmark_value) - 1 AS price_vs_benchmark,
+        product.effective_price_value AS effective_price,
+      FROM (
+        SELECT
+          unique_product_id,
+          target_country,
+          latest_date,
+          IF(
+            sale_price_effective_start_date <= CURRENT_TIMESTAMP()
+              AND sale_price_effective_end_date > CURRENT_TIMESTAMP(),
+            sale_price.value,
+            price.value) AS effective_price_value
+        FROM
+          `{project_id}.{dataset}.product_detailed_materialized`
+      ) AS product
       INNER JOIN (
         SELECT
           _PARTITIONDATE as data_date,

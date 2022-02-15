@@ -143,6 +143,8 @@ BEGIN
           MAX(pattern) AS pattern,
           ANY_VALUE(price) AS price,
           ANY_VALUE(sale_price) AS sale_price,
+          MAX(sale_price_effective_start_date) AS sale_price_effective_start_date,
+          MAX(sale_price_effective_end_date) AS sale_price_effective_end_date,
           ANY_VALUE(additional_product_types) AS additional_product_types
         FROM
           `{project_id}.{dataset}.product_view_{merchant_id}` product_view
