@@ -75,7 +75,16 @@ CREATE OR REPLACE VIEW `{project_id}.{dataset}.market_insights_snapshot_view` AS
     product,
     price_benchmarks,
     best_sellers,
-  FROM `{project_id}.{dataset}.product_detailed_materialized` product
+  FROM (
+    SELECT 
+      *, 
+      IF(
+       sale_price_effective_start_date <= CURRENT_TIMESTAMP()
+         AND sale_price_effective_end_date > CURRENT_TIMESTAMP(),
+       sale_price.value,
+       price.value) AS effective_price,
+    FROM `{project_id}.{dataset}.product_detailed_materialized`
+  ) AS product
   LEFT JOIN price_benchmarks
     ON product.unique_product_id = price_benchmarks.unique_product_id
     AND product.target_country = price_benchmarks.target_country
