@@ -153,6 +153,15 @@ During the installation process, the script will do following:
     *   product_detailed_materialized - Latest snapshot view of products combined with performance metrics. Each offer is split into rows for each targeted country, rows are keyed by unique_product_id and target_country.
     *   product_historical_materialized - Historic snapshot of performance metrics at a product category level.
 
+#### 2.2.4 [Optional] Update location and locales if different than US
+
+* If your data shouldn't be materialized in US, change the BigQuery dataset location in config.yaml
+
+* [Market Insights only] Adjust the locales in best_sellers_workflow.sql, by default set to "en-US"
+
+* You could make the changes before running the install script or after
+    * If you're making the changes afterwards, re-run the install script
+    * Check the scheduled queries in BigQuery and disable any older version of the Main Workflow
 
 ## 2.3. Configure Data Sources
 
