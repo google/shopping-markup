@@ -55,7 +55,7 @@ At this time, there are two onboarding options available:
 
 This is the base solution that exclusively uses the products and product issues
 tables available via the Merchant Center Transfer. This will allow you to set up the
-[Markup Dashboard Template](https://datastudio.google.com/reporting/b6ada6fa-9b6d-4fca-9621-f217a58a6ae2/page/l11LB/preview).
+[Markup Dashboard Template](https://datastudio.google.com/reporting/806b9d3e-073a-43c2-bba0-53a0eb65302f/page/QK7kB/preview).
 
 #### Markup + Market Insights
 
