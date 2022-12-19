@@ -71,6 +71,7 @@ additionally configure the Market Insights tables available via the Merchant Cen
 * `market_insights_historical` - a date partitioned view that joins the latest product feed data with historical price, price benchmarks, and Google Ads performance over the entire transfer data set.
 * `market_insights_best_sellers` - a view that joins the latest Best Sellers Top Products table with inventory status to show a ranked list of Top Products broken out by category.
     * Please note: this view is set to only show data for the `en-US` locale. For other locales, you will need to adjust the view's filtering after installation.
+    * In order to enable Market Insights in MarkUp, you will need to ensure that the Market Insights Policy has been accepted in Google Merchant Center.
 
 With these additional views, you will be able to set up the [Merchant Market Insights Dashboard Template](https://datastudio.google.com/reporting/37411ae9-b5f3-4062-89ea-ea521c885c30/page/QK7kB/preview) in addition to the above Markup Dashboard template.
 
