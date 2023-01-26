@@ -1,6 +1,7 @@
-google-cloud-bigquery==1.24
-google-api-python-client==1.8
-google-cloud-bigquery-datatransfer==1.0
-grpcio==1.29
-grpcio-tools==1.29
-PyYAML==5.4
+google-cloud-bigquery==3.4.2
+google-api-python-client==2.74.0
+google-cloud-bigquery-datatransfer==3.10.1
+grpcio==1.51.1
+grpcio-tools==1.51.1
+PyYAML==6.0
+pytz==2022.7.1
