@@ -14,7 +14,6 @@
 # limitations under the License.
 
 # python3
-# TODO: Move the module to cloud_utils after third_party migration.
 """Module for managing BigQuery data transfers."""
 
 import datetime
@@ -22,15 +21,12 @@ import logging
 import time
 from typing import Any, Dict
 
-import pytz
-
-import google.protobuf.json_format
+import auth
+import config_parser
 from google.cloud import bigquery_datatransfer
 from google.protobuf import struct_pb2
 from google.protobuf import timestamp_pb2
-import auth
-import config_parser
-import cloud_bigquery
+import pytz
 
 _MERCHANT_CENTER_ID = 'merchant_center'  # Data source id for Merchant Center.
 _GOOGLE_ADS_ID = 'adwords'  # Data source id for Google Ads.
@@ -82,16 +78,15 @@ class CloudDataTransferUtils(object):
     Raises:
       DataTransferError: If the data transfer is not successfully completed.
     """
-    # TODO: Use exponential back-off for polling.
     transfer_config_name = transfer_config.name
     transfer_config_id = transfer_config_name.split('/')[-1]
     poll_counter = 0  # Counter to keep polling count.
     while True:
-      transfer_config_path = ('projects/' + self.project_id + '/locations/'
-            + config_parser.get_dataset_location() + '/transferConfigs/'
-            + transfer_config_id)
+      transfer_config_path = ('projects/' + self.project_id + '/locations/' +
+                              config_parser.get_dataset_location() +
+                              '/transferConfigs/' + transfer_config_id)
       response = self.client.list_transfer_runs(
-            {'parent': transfer_config_path})
+          {'parent': transfer_config_path})
       latest_transfer = None
       for transfer in response:
         latest_transfer = transfer
@@ -118,7 +113,8 @@ class CloudDataTransferUtils(object):
         logging.error(error_message)
         raise DataTransferError(error_message)
 
-  def _get_existing_transfer(self, data_source_id: str,
+  def _get_existing_transfer(self,
+                             data_source_id: str,
                              destination_dataset_id: str = None,
                              params: Dict[str, str] = None,
                              name: str = None) -> bool:
@@ -128,6 +124,7 @@ class CloudDataTransferUtils(object):
       data_source_id: Data source id.
       destination_dataset_id: BigQuery dataset id.
       params: Data transfer specific parameters.
+      name: The display name of the transfer.
 
     Returns:
       Data Transfer if the transfer already exists.
@@ -135,10 +132,12 @@ class CloudDataTransferUtils(object):
     """
     dataset_location = config_parser.get_dataset_location()
     parent = 'projects/' + self.project_id + '/locations/' + dataset_location
-    for transfer_config in self.client.list_transfer_configs({'parent': parent}):
+    for transfer_config in self.client.list_transfer_configs({'parent': parent
+                                                             }):
       if transfer_config.data_source_id != data_source_id:
         continue
-      if destination_dataset_id and transfer_config.destination_dataset_id != destination_dataset_id:
+      if (destination_dataset_id and
+              transfer_config.destination_dataset_id != destination_dataset_id):
         continue
       # If the transfer config is in Failed state, we should ignore.
       is_valid_state = transfer_config.state in (_PENDING_STATE, _RUNNING_STATE,
@@ -169,8 +168,9 @@ class CloudDataTransferUtils(object):
         return False
     return True
 
-  def _update_existing_transfer(self, transfer_config: bigquery_datatransfer.TransferConfig,
-                                params: Dict[str, str]) -> bigquery_datatransfer.TransferConfig:
+  def _update_existing_transfer(
+      self, transfer_config: bigquery_datatransfer.TransferConfig,
+      params: Dict[str, str]) -> bigquery_datatransfer.TransferConfig:
     """Updates existing data transfer.
 
     If the parameters are already present in the config, then the transfer
@@ -184,8 +184,9 @@ class CloudDataTransferUtils(object):
       Updated data transfer config.
     """
     if self._check_params_match(transfer_config, params):
-      logging.info('The data transfer config "%s" parameters match. Hence '
-                   'skipping update.', transfer_config.display_name)
+      logging.info(
+          'The data transfer config "%s" parameters match. Hence '
+          'skipping update.', transfer_config.display_name)
       return transfer_config
     new_transfer_config = bigquery_datatransfer.TransferConfig()
     new_transfer_config.CopyFrom(transfer_config)
@@ -194,7 +195,7 @@ class CloudDataTransferUtils(object):
     for key, value in params.items():
       new_transfer_config.params[key] = value
     # Only params field is updated.
-    update_mask = {"paths": ["params"]}
+    update_mask = {'paths': ['params']}
     new_transfer_config = self.client.update_transfer_config(
         new_transfer_config, update_mask)
     logging.info('The data transfer config "%s" parameters updated.',
@@ -202,8 +203,7 @@ class CloudDataTransferUtils(object):
     return new_transfer_config
 
   def create_merchant_center_transfer(
-      self, merchant_id: str,
-      destination_dataset: str,
+      self, merchant_id: str, destination_dataset: str,
       enable_market_insights: bool) -> bigquery_datatransfer.TransferConfig:
     """Creates a new merchant center transfer.
 
@@ -328,34 +328,40 @@ class CloudDataTransferUtils(object):
       end_time_pb = timestamp_pb2.Timestamp()
       start_time_pb.FromDatetime(start_time)
       end_time_pb.FromDatetime(end_time)
-      self.client.schedule_transfer_runs(parent=transfer_config_path,
-                                         start_time=start_time_pb, end_time=end_time_pb)
+      self.client.schedule_transfer_runs(
+          parent=transfer_config_path,
+          start_time=start_time_pb,
+          end_time=end_time_pb)
     return transfer_config
 
-  def schedule_query(self,
-                     name: str,
+  def schedule_query(self, name: str,
                      query_string: str) -> bigquery_datatransfer.TransferConfig:
     """Schedules query to run every day.
 
     Args:
       name: Name of the scheduled query.
       query_string: The query to be run.
+
+    Returns:
+      Transfer config.
     """
-    data_transfer_config = self._get_existing_transfer('scheduled_query',
-                                                       name=name)
+    data_transfer_config = self._get_existing_transfer(
+        'scheduled_query', name=name)
     parameters = struct_pb2.Struct()
     parameters['query'] = query_string
     if data_transfer_config:
-      logging.info('Data transfer for scheduling query "%s" already exists.', name)
-      updated_transfer_config = self._update_existing_transfer(data_transfer_config, parameters)
+      logging.info('Data transfer for scheduling query "%s" already exists.',
+                   name)
+      updated_transfer_config = self._update_existing_transfer(
+          data_transfer_config, parameters)
       logging.info('Data transfer for scheduling query "%s" updated.', name)
       start_time_pb = timestamp_pb2.Timestamp()
       start_time = datetime.datetime.now(tz=pytz.utc)
       start_time_pb.FromDatetime(start_time)
-      self.client.start_manual_transfer_runs(parent=updated_transfer_config.name,
-                                             requested_run_time=start_time_pb)
-      logging.info('One time manual run started. It might take up to 1 hour for performance data'
-                   ' to reflect on the dash.')
+      self.client.start_manual_transfer_runs(
+          parent=updated_transfer_config.name, requested_run_time=start_time_pb)
+      logging.info('One time manual run started. It might take up to 1 hour for'
+                   ' performance data to reflect on the dash.')
       return updated_transfer_config
     dataset_location = config_parser.get_dataset_location()
     has_valid_credentials = self._check_valid_credentials('scheduled_query')
@@ -377,15 +383,16 @@ class CloudDataTransferUtils(object):
     transfer_config = self.client.create_transfer_config(request=request)
     return transfer_config
 
-  def _get_data_source(self, data_source_id: str) -> bigquery_datatransfer.DataSource:
+  def _get_data_source(self,
+                       data_source_id: str) -> bigquery_datatransfer.DataSource:
     """Returns data source.
 
     Args:
       data_source_id: Data source id.
     """
     dataset_location = config_parser.get_dataset_location()
-    name = 'projects/' + self.project_id + '/locations/' + \
-        dataset_location + '/dataSources/' + data_source_id
+    name = ('projects/' + self.project_id + '/locations/' + dataset_location +
+            '/dataSources/' + data_source_id)
     return self.client.get_data_source({'name': name})
 
   def _check_valid_credentials(self, data_source_id: str) -> bool:
@@ -395,8 +402,8 @@ class CloudDataTransferUtils(object):
       data_source_id: Data source id.
     """
     dataset_location = config_parser.get_dataset_location()
-    name = 'projects/' + self.project_id + '/locations/' + \
-        dataset_location + '/dataSources/' + data_source_id
+    name = ('projects/' + self.project_id + '/locations/' + dataset_location +
+            '/dataSources/' + data_source_id)
     response = self.client.check_valid_creds({'name': name})
     return response.has_valid_creds
 

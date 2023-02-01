@@ -18,11 +18,11 @@
 
 import logging
 import os
-from typing import Any, Dict, Union
+from typing import Any, Dict
 
+import config_parser
 from google.cloud import bigquery
 from google.cloud import exceptions
-import config_parser
 
 # Main workflow sql.
 _MAIN_WORKFLOW_SQL = 'scripts/main_workflow.sql'
@@ -103,8 +103,9 @@ def read_file(file_path: str) -> str:
   try:
     with open(file_path, 'r') as stream:
       content = stream.read()
-  except FileNotFoundError:
-    raise FileNotFoundError(f'The file "{file_path}" could not be found.')
+  except FileNotFoundError as e:
+    raise FileNotFoundError(
+        f'The file "{file_path}" could not be found.') from e
   else:
     return content
 
@@ -136,7 +137,8 @@ def configure_sql(sql_path: str, query_params: Dict[str, Any]) -> str:
 def execute_queries(project_id: str, dataset_id: str, merchant_id: str,
                     customer_id: str, enable_market_insights: bool) -> None:
   """Executes list of queries."""
-  # Sql files to be executed in a specific order. The prefix "scripts" should be omitted.
+  # Sql files to be executed in a specific order.
+  # The prefix "scripts" should be omitted.
   sql_files = [
       '1_product_view.sql',
       'targeted_products/targeted_product_ddl.sql',
@@ -149,8 +151,8 @@ def execute_queries(project_id: str, dataset_id: str, merchant_id: str,
   ]
   if enable_market_insights:
     market_insights_sql_files = [
-      'market_insights/snapshot_view.sql',
-      'market_insights/historical_view.sql'
+        'market_insights/snapshot_view.sql',
+        'market_insights/historical_view.sql'
     ]
     sql_files.extend(market_insights_sql_files)
   prefix = 'scripts'

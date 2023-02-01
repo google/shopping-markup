@@ -27,12 +27,11 @@ import logging
 import os
 from typing import Dict, Union
 
-from google.cloud import exceptions
-from plugins.cloud_utils import cloud_api
 import cloud_bigquery
 import cloud_data_transfer
 import config_parser
-
+from google.cloud import exceptions
+from plugins.cloud_utils import cloud_api
 
 # Set logging level.
 logging.getLogger().setLevel(logging.INFO)
@@ -44,7 +43,8 @@ _APIS_TO_BE_ENABLED = [
 ]
 _DATASET_ID = 'markup'
 _MATERIALIZE_PRODUCT_DETAILED_SQL = 'scripts/materialize_product_detailed.sql'
-_MATERIALIZE_PRODUCT_HISTORICAL_SQL = 'scripts/materialize_product_historical.sql'
+_MATERIALIZE_PRODUCT_HISTORICAL_SQL = (
+    'scripts/materialize_product_historical.sql')
 
 
 def enable_apis(project_id: str) -> None:
@@ -61,7 +61,7 @@ def parse_boolean(arg: str):
   """Returns boolean representation of argument."""
   arg = str(arg).lower()
   if 'true'.startswith(arg):
-      return True
+    return True
   return False
 
 
@@ -120,27 +120,24 @@ def main():
   cloud_bigquery.load_language_codes(args.project_id, args.dataset_id)
   cloud_bigquery.load_geo_targets(args.project_id, args.dataset_id)
   logging.info('Creating MarkUp specific views.')
-  cloud_bigquery.execute_queries(args.project_id, args.dataset_id, args.merchant_id,
-                                 ads_customer_id, args.market_insights)
+  cloud_bigquery.execute_queries(args.project_id, args.dataset_id,
+                                 args.merchant_id, ads_customer_id,
+                                 args.market_insights)
   logging.info('Created MarkUp specific views.')
   logging.info('Updating targeted products')
-  query_params = {
-      'project_id': args.project_id,
-      'dataset': args.dataset_id,
-      'merchant_id': args.merchant_id,
-      'external_customer_id': ads_customer_id
-  }
-  query = cloud_bigquery.get_main_workflow_sql(
-    args.project_id, args.dataset_id, args.merchant_id, ads_customer_id)
-  data_transfer.schedule_query(f'Main workflow - {args.dataset_id} - {ads_customer_id}',
-                               query)
+  query = cloud_bigquery.get_main_workflow_sql(args.project_id, args.dataset_id,
+                                               args.merchant_id,
+                                               ads_customer_id)
+  data_transfer.schedule_query(
+      f'Main workflow - {args.dataset_id} - {ads_customer_id}', query)
   logging.info('Job created to run markup main workflow.')
   if args.market_insights:
     logging.info('Market insights requested, creating scheduled query')
     best_sellers_query = cloud_bigquery.get_best_sellers_workflow_sql(
         args.project_id, args.dataset_id, args.merchant_id)
     data_transfer.schedule_query(
-        f'Best sellers workflow - {args.dataset_id} - {args.merchant_id}',best_sellers_query)
+        f'Best sellers workflow - {args.dataset_id} - {args.merchant_id}',
+        best_sellers_query)
     logging.info('Job created to run best sellers workflow.')
   logging.info('MarkUp installation is complete!')
 

@@ -30,6 +30,12 @@ def _get_config(config_key: str) -> str:
   The config values are retrieved from "config.yaml" file for the
   first invocation of config key. The subsequent invocation returns
   the value from cache.
+
+  Args:
+    config_key: The key to retrieve a value for.
+
+  Returns:
+    Value for key from config file.
   """
 
   with open('config.yaml') as config_file:
