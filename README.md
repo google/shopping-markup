@@ -1,20 +1,11 @@
 # MarkUp
 
-<<<<<<< HEAD
----
-   > **We don't recommend installing this tool if you are running only `PerfMax` campaigns.  We are working on a solution to handle `PerfMax` campaigns within the scope of this solution, so stay tuned for next update!**
----
-
-> Disclaimer: This is not an officially supported Google product.
-
-=======
 --------------------------------------------------------------------------------
 
 > NEW UPDATE: This tool is deprecated, please go to
 > [Shopping Insider](https://github.com/google/shopping_insider)
 
 > Disclaimer: This is not an officially supported Google product.
->>>>>>> 58ad2c7 (update message)
 
 ### Please re-install MarkUp if you have installed it before <b>Oct 2021</b>. This is to support the breaking schema changes in BigQuery Data Transfer Service.
 
