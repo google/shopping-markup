@@ -1,13 +1,23 @@
 # MarkUp
 
+<<<<<<< HEAD
 ---
    > **We don't recommend installing this tool if you are running only `PerfMax` campaigns.  We are working on a solution to handle `PerfMax` campaigns within the scope of this solution, so stay tuned for next update!**
 ---
 
 > Disclaimer: This is not an officially supported Google product.
 
+=======
+--------------------------------------------------------------------------------
+
+> NEW UPDATE: This tool is deprecated, please go to
+> [Shopping Insider](https://github.com/google/shopping_insider)
+
+> Disclaimer: This is not an officially supported Google product.
+>>>>>>> 58ad2c7 (update message)
 
 ### Please re-install MarkUp if you have installed it before <b>Oct 2021</b>. This is to support the breaking schema changes in BigQuery Data Transfer Service.
+
 <br />
 
 MarkUp is a tool to enable retailers grow their business using
@@ -59,21 +69,33 @@ At this time, there are two onboarding options available:
 #### Markup
 
 This is the base solution that exclusively uses the products and product issues
-tables available via the Merchant Center Transfer. This will allow you to set up the
+tables available via the Merchant Center Transfer. This will allow you to set up
+the
 [Markup Dashboard Template](https://datastudio.google.com/reporting/806b9d3e-073a-43c2-bba0-53a0eb65302f/page/QK7kB/preview).
 
 #### Markup + Market Insights
 
 By enabling Market Insights during the installation process, this will
-additionally configure the Market Insights tables available via the Merchant Center Transfer, Price Benchmarks & Best Sellers, as well as three additional BigQuery views:
+additionally configure the Market Insights tables available via the Merchant
+Center Transfer, Price Benchmarks & Best Sellers, as well as three additional
+BigQuery views:
 
-* `market_insights_snapshot` - a snapshot view that joins the latest product feed data with available price benchmarks, best seller status, and Google Ads performance over the last 30 days.
-* `market_insights_historical` - a date partitioned view that joins the latest product feed data with historical price, price benchmarks, and Google Ads performance over the entire transfer data set.
-* `market_insights_best_sellers` - a view that joins the latest Best Sellers Top Products table with inventory status to show a ranked list of Top Products broken out by category.
-    * Please note: this view is set to only show data for the `en-US` locale. For other locales, you will need to adjust the view's filtering after installation.
+*   `market_insights_snapshot` - a snapshot view that joins the latest product
+    feed data with available price benchmarks, best seller status, and Google
+    Ads performance over the last 30 days.
+*   `market_insights_historical` - a date partitioned view that joins the latest
+    product feed data with historical price, price benchmarks, and Google Ads
+    performance over the entire transfer data set.
+*   `market_insights_best_sellers` - a view that joins the latest Best Sellers
+    Top Products table with inventory status to show a ranked list of Top
+    Products broken out by category.
+    *   Please note: this view is set to only show data for the `en-US` locale.
+        For other locales, you will need to adjust the view's filtering after
+        installation.
 
-With these additional views, you will be able to set up the [Merchant Market Insights Dashboard Template](https://datastudio.google.com/reporting/37411ae9-b5f3-4062-89ea-ea521c885c30/page/QK7kB/preview) in addition to the above Markup Dashboard template.
-
+With these additional views, you will be able to set up the
+[Merchant Market Insights Dashboard Template](https://datastudio.google.com/reporting/37411ae9-b5f3-4062-89ea-ea521c885c30/page/QK7kB/preview)
+in addition to the above Markup Dashboard template.
 
 ## 2. Installation
 
@@ -105,14 +127,19 @@ Make sure the user running the installation has following permissions.
 ### 2.2. Cloud environment setup
 
 #### 2.2.1 Setup local environment.
+
 [Download and authenticate gcloud.](https://cloud.google.com/sdk/#Quick_Start)
 
-Alternatively, if the GMC account has less than 50 Million products, you could use [Cloud Shell](https://ssh.cloud.google.com/cloudshell?shellonly=true), which comes with gcloud already installed. The cloud shell disconnects after 1 hour and hence we recommend using local environment for large accounts since they could take more than 1 hour to finish the installation.
+Alternatively, if the GMC account has less than 50 Million products, you could
+use [Cloud Shell](https://ssh.cloud.google.com/cloudshell?shellonly=true), which
+comes with gcloud already installed. The cloud shell disconnects after 1 hour
+and hence we recommend using local environment for large accounts since they
+could take more than 1 hour to finish the installation.
 
 #### 2.2.2 Check out source codes
 
-Open the [cloud shell](https://ssh.cloud.google.com/cloudshell?shellonly=true) or your terminal(if running locally)
-and clone the repository.
+Open the [cloud shell](https://ssh.cloud.google.com/cloudshell?shellonly=true)
+or your terminal(if running locally) and clone the repository.
 
 ```
   git clone https://github.com/google/shopping-markup
@@ -128,7 +155,8 @@ Please provide following inputs when running the `setup.sh` script:
 
 *   [Google Ads External Customer Id](https://support.google.com/google-ads/answer/1704344?hl=en)
 
-*   Market Insights - whether to deploy Market Insights solution. Allowed Values - True or False
+*   Market Insights - whether to deploy Market Insights solution. Allowed
+    Values - True or False
 
 ```
 cd shopping-markup;
@@ -155,18 +183,27 @@ During the installation process, the script will do following:
     near real time.
 
 *   Create following MarkUp specific SQL tables.
-    *   product_detailed_materialized - Latest snapshot view of products combined with performance metrics. Each offer is split into rows for each targeted country, rows are keyed by unique_product_id and target_country.
-    *   product_historical_materialized - Historic snapshot of performance metrics at a product category level.
+
+    *   product_detailed_materialized - Latest snapshot view of products
+        combined with performance metrics. Each offer is split into rows for
+        each targeted country, rows are keyed by unique_product_id and
+        target_country.
+    *   product_historical_materialized - Historic snapshot of performance
+        metrics at a product category level.
 
 #### 2.2.4 [Optional] Update location and locales if different than US
 
-* If your data shouldn't be materialized in US, change the BigQuery dataset location in config.yaml
+*   If your data shouldn't be materialized in US, change the BigQuery dataset
+    location in config.yaml
 
-* [Market Insights only] Adjust the locales in best_sellers_workflow.sql, by default set to "en-US"
+*   [Market Insights only] Adjust the locales in best_sellers_workflow.sql, by
+    default set to "en-US"
 
-* You could make the changes before running the install script or after
-    * If you're making the changes afterwards, re-run the install script
-    * Check the scheduled queries in BigQuery and disable any older version of the Main Workflow
+*   You could make the changes before running the install script or after
+
+    *   If you're making the changes afterwards, re-run the install script
+    *   Check the scheduled queries in BigQuery and disable any older version of
+        the Main Workflow
 
 ## 2.3. Configure Data Sources
 
@@ -174,8 +211,10 @@ You will need to create or copy required Data Source(s) in Data Studio:
 
 ### For Markup:
 
-*   Create `product_detailed_materialized` Data Source (linked to `markup.product_detailed_materialized`)
-*   Create `product_historical_materialized` Data Source (linked to `markup.product_historical_materialized`)
+*   Create `product_detailed_materialized` Data Source (linked to
+    `markup.product_detailed_materialized`)
+*   Create `product_historical_materialized` Data Source (linked to
+    `markup.product_historical_materialized`)
 
 To create a data source:
 
@@ -196,23 +235,31 @@ To create a data source:
 
 ### For Merchant Market Insights:
 
-*   Copy [Market Insights Snapshot (TEMPLATE)](https://datastudio.google.com/datasources/9dbdb290-0ea6-4d81-90df-5e4f9ec6f504) and connect it to `markup.market_insights_snapshot_view`
-*   Copy [Market Insights Historical (TEMPLATE)](https://datastudio.google.com/datasources/0397b27f-96b8-44cd-afca-645f64882a26) and connect it to `markup.market_insights_historical_view`
-*   Copy  [Market Insights Best Sellers (TEMPLATE)](https://datastudio.google.com/datasources/b2f5bafe-01e2-4e30-bfb3-022a6c2f3ad6) and connect it to `markup.market_insights_best_sellers_materialized`
+*   Copy
+    [Market Insights Snapshot (TEMPLATE)](https://datastudio.google.com/datasources/9dbdb290-0ea6-4d81-90df-5e4f9ec6f504)
+    and connect it to `markup.market_insights_snapshot_view`
+*   Copy
+    [Market Insights Historical (TEMPLATE)](https://datastudio.google.com/datasources/0397b27f-96b8-44cd-afca-645f64882a26)
+    and connect it to `markup.market_insights_historical_view`
+*   Copy
+    [Market Insights Best Sellers (TEMPLATE)](https://datastudio.google.com/datasources/b2f5bafe-01e2-4e30-bfb3-022a6c2f3ad6)
+    and connect it to `markup.market_insights_best_sellers_materialized`
 
 To copy a data source:
 
-*  Click on the data source template link above.
+*   Click on the data source template link above.
 
-*  Click on the  <img src="images/copy_icon.png">  icon in the top right corner next to "Create Report".
+*   Click on the <img src="images/copy_icon.png"> icon in the top right corner
+    next to "Create Report".
 
-*  Click "Copy Data Source" on the "Copy Data Source" pop-up.
+*   Click "Copy Data Source" on the "Copy Data Source" pop-up.
 
-*  Select your Project, Dataset, and Table to be connected, then press "Reconnect" in the top right corner.
+*   Select your Project, Dataset, and Table to be connected, then press
+    "Reconnect" in the top right corner.
 
-*  Click "Apply" on the "Apply Connection Changes" pop-up
+*   Click "Apply" on the "Apply Connection Changes" pop-up
 
-*  Repeat this process for all three data source templates above.
+*   Repeat this process for all three data source templates above.
 
 ## 2.4. Create Data-Studio Dashboard(s)
 
@@ -223,7 +270,9 @@ To copy a data source:
 
 *   Click "`Use Template`"
 
-*   Choose the new "`product_detailed_materialized`" and "`product_historical_materialized`" data-sources created in the previous step
+*   Choose the new "`product_detailed_materialized`" and
+    "`product_historical_materialized`" data-sources created in the previous
+    step
 
 *   Click "`Copy Report`"
 
